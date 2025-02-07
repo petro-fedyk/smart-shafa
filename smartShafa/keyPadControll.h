@@ -8,15 +8,16 @@
 class keyPadControll
 {
 private:
-    uint8_t enteredPin[4];
-    uint8_t currentPin;
-    uint8_t tempPin;
+    char enteredPin[4];
+    char currentPin;
+    char tempPin;
     bool isCorrectPin;
     bool changePinMode;
     Keypad &isPressed;
+    Storage &storage;
 
 public:
-    keyPadControll();
+    keyPadControll(Storage &storage);
     bool isCorrectPin();
     void changePin(CHANGE_PIN);
 }
