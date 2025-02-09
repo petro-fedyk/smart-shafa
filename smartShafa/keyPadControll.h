@@ -13,6 +13,7 @@ private:
     char tempPin;
     bool isCorrectPin;
     bool changePinMode;
+    bool isEnteredPin;
     Keypad &isPressed;
     Storage &storage;
 

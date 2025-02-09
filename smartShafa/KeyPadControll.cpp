@@ -9,6 +9,7 @@ bool keyPadControll::isCorrectPin()
 
     if (key)
     {
+        isEnteredPin = true; // todo
         if (key == BTN_CONFIRM)
         {
             for (int i = 0; i < 4; i++)
@@ -22,6 +23,10 @@ bool keyPadControll::isCorrectPin()
         }
     }
     return false;
+    else
+    {
+        isEnteredPin = false;
+    }
 }
 
 void keyPadControll::changePin()
@@ -110,3 +115,4 @@ void keyPadControll::changePin()
             }
         }
     }
+}

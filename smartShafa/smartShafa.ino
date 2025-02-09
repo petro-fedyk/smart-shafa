@@ -1,6 +1,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
 #include "wifiConnect.h"
+#include "keyPadControll.h"
 #include "mainControll.h"
 #include "clock.h"
 #include "config.h"
@@ -8,6 +9,8 @@
 #include "pin.h"
 #include "security.h"
 #include "transistor.h"
+#include "lcd.h"
+#include "storage.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
