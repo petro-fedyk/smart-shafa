@@ -5,6 +5,7 @@ uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
 keyPadControll::keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
+
 bool keyPadControll::isCorrectPin()
 {
     uint8_t storedPin[4];
@@ -32,6 +33,31 @@ bool keyPadControll::isCorrectPin()
 
 void keyPadControll::keyPadLoop() // to do
 {
+    changePin();
+    if (key == BTN_CONFIRM)
+    {
+        if (isCorrectPin())
+        {
+            lcd.clear();
+            lcd.print("Access Granted");
+            Transistor.on();
+            lockTime = millis();
+            while (millis() - lockTime < 2000)
+            {
+            }
+        }
+        else
+        {
+            lcd.clear();
+            lcd.print("Wrong Code");
+            Transistor.off();
+            lockTime = millis();
+            while (millis() - lockTime < 2000)
+            {
+                        }
+        }
+    }
+    lcd.clear();
 }
 
 void keyPadControll::changePin()

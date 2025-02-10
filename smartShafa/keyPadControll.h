@@ -2,6 +2,7 @@
 #define KEYPAD_CONTROLL_H
 
 #include <Keypad.h>
+#include "transistor.h"
 #include <config.h>
 #include <pin.h>
 
@@ -17,6 +18,8 @@ private:
     Keypad &isPressed;
     Storage &storage;
     LiquidCrystal_I2C &lcd;
+    Transistor &on();
+    Transistor &off();
 
 public:
     keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
