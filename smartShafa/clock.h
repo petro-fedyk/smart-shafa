@@ -18,7 +18,6 @@ private:
     void setFont();
     void drawDigit(int col, int digit);
     void displayTime(int hours, int minutes);
-    bool showClock;
 
 public:
     MyClock(LiquidCrystal_I2C *lcd, long gmtOffset_sec, int daylightOffset_sec,

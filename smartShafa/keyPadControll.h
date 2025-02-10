@@ -10,17 +10,19 @@ class keyPadControll
 private:
     char enteredPin[4];
     char currentPin;
-    char tempPin;
     bool isCorrectPin;
     bool changePinMode;
     bool isEnteredPin;
+    uint8_t pinIndex;
     Keypad &isPressed;
     Storage &storage;
+    LiquidCrystal_I2C &lcd;
 
 public:
-    keyPadControll(Storage &storage);
+    keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
     bool isCorrectPin();
-    void changePin(CHANGE_PIN);
+    void changePin();
+    void keyPadLoop();
 }
 
 #endif

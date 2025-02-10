@@ -1,117 +1,128 @@
 #include <Keypad.h>
 #include "keyPadControll.h"
 
-keyPadControll::keyPadControll(Storage &storage);
+uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
+uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
+
+keyPadControll::keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
 bool keyPadControll::isCorrectPin()
 {
-    char storedPin[4];
-    storage.loadPassword(0, storedPin, 4);
+    uint8_t storedPin[4];
+    int passwordCount = storage.getPasswordCount();
 
-    if (key)
+    for (int i = 0; i < passwordCount; i++)
     {
-        isEnteredPin = true; // todo
-        if (key == BTN_CONFIRM)
+        storage.loadPassword(i, storedPin, 4);
+        bool match = true;
+        for (int j = 0; j < 4; j++)
         {
-            for (int i = 0; i < 4; i++)
+            if (enteredPin[j] != storedPin[j])
             {
-                if (enteredPin[i] != storedPin[i])
-                {
-                    return false;
-                }
+                match = false;
+                break;
             }
+        }
+        if (match)
+        {
             return true;
         }
     }
     return false;
-    else
-    {
-        isEnteredPin = false;
-    }
+}
+
+void keyPadControll::keyPadLoop() // to do
+{
 }
 
 void keyPadControll::changePin()
 {
-    static bool waitingForCurrentPin = true;
+    static bool waitingForOldPin = true;
     static bool waitingForNewPin = false;
     static bool waitingForConfirmNewPin = false;
     static char newPin[4];
     static int pinIndex = 0;
 
-    if (key)
+    if (key == BTN_RESET)
     {
-        if (key == BTN_RESET)
+        memset(enteredPin, 0, 4);
+        memset(newPin, 0, 4);
+        pinIndex = 0;
+        waitingForOldPin = true;
+        waitingForNewPin = false;
+        waitingForConfirmNewPin = false;
+        lcd.clear();
+        return;
+    }
+
+    if (key == CHANGE_PIN)
+    {
+        changePinMode = true;
+        lcd.clear();
+        lcd.print("Enter Old Pass:");
+        pinIndex = 0;
+        memset(enteredPin, 0, 4);
+        return;
+    }
+
+    if (changePinMode)
+    {
+        if (key && key != BTN_CONFIRM)
         {
-            memset(enteredPin, 0, 4);
-            memset(newPin, 0, 4);
-            pinIndex = 0;
-            waitingForCurrentPin = true;
-            waitingForNewPin = false;
-            waitingForConfirmNewPin = false;
-            return;
+            if (pinIndex < 4)
+            {
+                enteredPin[pinIndex++] = key;
+            }
         }
 
-        if (waitingForCurrentPin)
+        if (key == BTN_CONFIRM)
         {
-            if (key == BTN_CONFIRM)
+            if (waitingForOldPin)
             {
-                char storedPin[4];
-                storage.loadPassword(0, storedPin, 4);
-
-                if (memcmp(enteredPin, storedPin, 4) == 0)
+                if (isCorrectPin())
                 {
-                    memset(enteredPin, 0, 4);
+                    lcd.clear();
+                    lcd.print("Enter New PIN:");
                     pinIndex = 0;
-                    waitingForCurrentPin = false;
+                    memset(enteredPin, 0, 4);
+                    waitingForOldPin = false;
                     waitingForNewPin = true;
                 }
-
                 else
                 {
-                    if (pinIndex < 4)
-                    {
-                        enteredPin[pinIndex++] = key;
-                    }
+                    lcd.clear();
+                    lcd.print("Incorrect PIN!");
+                    pinIndex = 0;
+                    memset(enteredPin, 0, 4);
                 }
             }
             else if (waitingForNewPin)
             {
-                if (key == BTN_CONFIRM)
-                {
-                    memcpy(newPin, enteredPin, 4);
-                    memset(enteredPin, 0, 4);
-                    pinIndex = 0;
-                    waitingForNewPin = false;
-                    waitingForConfirmNewPin = true;
-                }
-                else
-                {
-                    if (pinIndex < 4)
-                    {
-                        enteredPin[pinIndex++] = key;
-                    }
-                }
+                memcpy(newPin, enteredPin, 4);
+                lcd.clear();
+                lcd.print("Confirm New PIN:");
+                pinIndex = 0;
+                memset(enteredPin, 0, 4);
+                waitingForNewPin = false;
+                waitingForConfirmNewPin = true;
             }
             else if (waitingForConfirmNewPin)
             {
-                if (key == BTN_CONFIRM)
+                if (memcmp(enteredPin, newPin, 4) == 0)
                 {
-                    if (memcmp(enteredPin, newPin, 4) == 0)
-                    {
-                        storage.savePassword(0, newPin, 4);
-                    }
-
-                    memset(enteredPin, 0, 4);
-                    memset(newPin, 0, 4);
-                    pinIndex = 0;
-                    waitingForConfirmNewPin = false;
+                    storage.savePassword(0, newPin, 4);
+                    lcd.clear();
+                    lcd.print("PIN Changed!");
                 }
                 else
                 {
-                    if (pinIndex < 4)
-                    {
-                        enteredPin[pinIndex++] = key;
-                    }
+                    lcd.clear();
+                    lcd.print("Pins Don't Match!");
                 }
+                pinIndex = 0;
+                memset(enteredPin, 0, 4);
+                memset(newPin, 0, 4);
+                waitingForConfirmNewPin = false;
+                changePinMode = false;
             }
         }
     }
