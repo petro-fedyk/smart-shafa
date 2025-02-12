@@ -6,16 +6,17 @@
 class Storage
 {
 private:
-    const string pinPath;
-    const string wifiPath;
+    const string *pinPath = "/littleFS/pin.json";
+    const string *wifiPath = "/littleFS/wifi.json";
+    const string *dir = "littleFS";
 
 public:
     Storage();
-    char[4] pin;
+    char pin[4];
     void readPin();
     void writePin();
     void deletePin();
-    void checkFolder();
+    void checkFolder(const char *path);
     void writeWiFiData();
     void readWiFiData();
 };
