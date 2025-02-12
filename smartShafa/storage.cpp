@@ -1,58 +1,24 @@
-#include "Storage.h"
-#include <EEPROM.h>
+#include "storage.h"
 
-char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
-    {'1', '2', '3', 'A'},
-    {'4', '5', '6', 'B'},
-    {'7', '8', '9', 'C'},
-    {BTN_CONFIRM, '0', BTN_RESET, 'D'}};
-
-const uint8_t initialPassword[PASSWORD_LENGTH] = {'1', '2', '3', '4'};
-
-void Storage::begin()
+Storage::Storage();
+void Storage::readPin()
 {
-    EEPROM.begin(512);
-    passwordCount = EEPROM.read(0);
+    File file = LittleFS.open("/littleFS/pin.json", "r");
+    if (!file) {
+        Serial.println("Не вдалося відкрити users.json!");
+        return;
+    }
 
-    if (passwordCount == 0 || passwordCount > MAX_PASSWORDS)
-    {
-        savePassword(0, initialPassword, PASSWORD_LENGTH);
-        incrementPasswordCount();
+    DynamicJsonDocument doc(512);
+    deserializeJson(doc, file);
+    file.close();
+
+    for (JsonVariant user : doc["users"].as<JsonArray>()) {
+        Serial.printf("ID: %d, PIN: %s\n", user["id"].as<int>(), user["pin"].as<const char*>());
     }
 }
-
-void Storage::savePassword(uint8_t index, const uint8_t *password, int length)
-{
-    int address = 1 + index * PASSWORD_LENGTH;
-
-    for (int i = 0; i < length; i++)
-    {
-        EEPROM.write(address + i, password[i]);
-    }
-    EEPROM.commit();
-}
-
-void Storage::loadPassword(uint8_t index, uint8_t *buffer, int length)
-{
-    int address = 1 + index * PASSWORD_LENGTH;
-
-    for (int i = 0; i < length; i++)
-    {
-        buffer[i] = EEPROM.read(address + i);
-    }
-}
-
-uint8_t Storage::getPasswordCount()
-{
-    return passwordCount;
-}
-
-void Storage::incrementPasswordCount()
-{
-    if (passwordCount < MAX_PASSWORDS)
-    {
-        passwordCount++;
-        EEPROM.write(0, passwordCount);
-        EEPROM.commit();
-    }
-}
+void Storage::writePin();
+void Storage::deletePin();
+void Storage::checkFolder();
+void Storage::writeWiFiData();
+void Storage::readWiFiData();
