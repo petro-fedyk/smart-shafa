@@ -1,28 +1,24 @@
 #ifndef STORAGE_H
 #define STORAGE_H
-
-#include "pin.h"
-#include <stdint.h>
-#include <EEPROM.h>
-#include "Config.h"
-#include "pin.h"
-
-extern char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS];
-
-const int MAX_PASSWORDS = 5;
-const int PASSWORD_LENGTH = 4;
+#include <ArduinoJson.h>
+#include <LittleFS.h>
 
 class Storage
 {
-public:
-    void begin();
-    void savePassword(uint8_t index, const char *password, uint8_t length);
-    void loadPassword(uint8_t index, char *buffer, uint8_t length);
-    uint8_t getPasswordCount();
-    void incrementPasswordCount();
-
 private:
-    uint8_t passwordCount = 0;
+    const string *pinPath = "/littleFS/pin.json";
+    const string *wifiPath = "/littleFS/wifi.json";
+    const string *dir = "littleFS";
+
+public:
+    Storage();
+    char pin[4];
+    void readPin();
+    void writePin();
+    void deletePin();
+    void checkFolder(const char *path);
+    void writeWiFiData();
+    void readWiFiData();
 };
 
 #endif
