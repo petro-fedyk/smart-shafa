@@ -33,7 +33,6 @@ bool keyPadControll::isCorrectPin()
 
 void keyPadControll::keyPadLoop() // to do
 {
-    changePin();
     if (key == BTN_CONFIRM)
     {
         if (isCorrectPin())
@@ -56,6 +55,9 @@ void keyPadControll::keyPadLoop() // to do
             {
                         }
         }
+    }
+    if (key == CHANGE_PIN){
+        changePin();
     }
     lcd.clear();
 }
