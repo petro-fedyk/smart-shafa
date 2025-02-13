@@ -7,8 +7,8 @@
 class Storage
 {
 private:
-    const string *pinPath = "/littleFS/pin.json";
-    const string *wifiPath = "/littleFS/wifi.json";
+    const string *pinPath = "/pin.json";
+    const string *wifiPath = "/wifi.json";
     const string *dir = "littleFS";
 
 public:
