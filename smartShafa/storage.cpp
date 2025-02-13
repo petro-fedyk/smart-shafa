@@ -43,5 +43,48 @@ void Storage::checkFolder()
     }
 }
 
-void Storage::writeWiFiData();
-void Storage::readWiFiData();
+void Storage::writeWiFiData()
+{
+    // no logic to get ssid and password yet
+    File file = LittleFS.open(wifiPath, "w");
+    if (file) {
+        file.printf("{\"ssid\": \"%s\", \"password\": \"%s\"}", ssid, password);
+        file.close();
+    } else {
+        checkFolder();
+    }
+
+}
+void Storage::readWiFiData(){
+
+    File file = LittleFS.open(wifiPath, "r");
+    if (!file) {
+        Serial.println("Failed to open WiFi config file");
+        return;
+    }
+
+    String fileContent;
+    while (file.available()) {
+        fileContent += (char)file.read();
+    }
+    file.close();
+
+    StaticJsonDocument<256> doc;
+    DeserializationError error = deserializeJson(doc, fileContent);
+
+    if (error) {
+        Serial.print("JSON deserialization failed: ");
+        Serial.println(error.f_str());
+        return;
+    }
+
+    String ssid = doc["ssid"].as<String>();
+    String password = doc["password"].as<String>();
+
+    Serial.print("SSID: ");
+    Serial.println(ssid);
+    Serial.print("Password: ");
+    Serial.println(password);
+
+    // TODO: Store ssid and password in global variables or use them as needed
+}
