@@ -17,32 +17,39 @@ void Storage::readPin()
     }
     return pin;
 }
-void Storage::writePin(String& newPin){
+void Storage::writePin(String &newPin)
+{
     File file = LittleFS.open(wifiPath, "r");
     String fileContent;
-    if (file) {
-        while (file.available()) {
+    if (file)
+    {
+        while (file.available())
+        {
             fileContent += (char)file.read();
         }
         file.close();
-    } else {
+    }
+    else
+    {
         Serial.println("Failed to open users file, creating a new one...");
         fileContent = "{\"users\":[]}";
     }
 
     StaticJsonDocument<512> doc;
     DeserializationError error = deserializeJson(doc, fileContent);
-    
-    if (error) {
+
+    if (error)
+    {
         Serial.print("JSON deserialization failed: ");
         Serial.println(error.f_str());
         return;
     }
 
     JsonArray users = doc["users"].as<JsonArray>();
-    
+
     int newId = 1;
-    if (users.size() > 0) {
+    if (users.size() > 0)
+    {
         newId = users[users.size() - 1]["id"].as<int>() + 1;
     }
 
@@ -54,18 +61,20 @@ void Storage::writePin(String& newPin){
     serializeJson(doc, updatedJson);
 
     file = LittleFS.open(filePath, "w");
-    if (file) {
+    if (file)
+    {
         file.print(updatedJson);
         file.close();
         Serial.println("New PIN added successfully!");
-    } else {
+    }
+    else
+    {
         Serial.println("Failed to save updated users file!");
     }
-
 }
 void Storage::deletePin()
 {
-    //how and for what?
+    // how and for what?
 }
 void Storage::checkFolder()
 {
@@ -91,28 +100,33 @@ void Storage::checkFolder()
     }
 }
 
-void Storage::writeWiFiData(String& ssid, String& password)
+void Storage::writeWiFiData(String &ssid, String &password)
 {
     // no logic to get ssid and password yet
     File file = LittleFS.open(wifiPath, "w");
-    if (file) {
+    if (file)
+    {
         file.printf("{\"ssid\": \"%s\", \"password\": \"%s\"}", ssid, password);
         file.close();
-    } else {
+    }
+    else
+    {
         checkFolder();
     }
-
 }
-void Storage::readWiFiData(){
+void Storage::readWiFiData()
+{
 
     File file = LittleFS.open(wifiPath, "r");
-    if (!file) {
+    if (!file)
+    {
         Serial.println("Failed to open WiFi config file");
         return;
     }
 
     String fileContent;
-    while (file.available()) {
+    while (file.available())
+    {
         fileContent += (char)file.read();
     }
     file.close();
@@ -120,7 +134,8 @@ void Storage::readWiFiData(){
     StaticJsonDocument<256> doc;
     DeserializationError error = deserializeJson(doc, fileContent);
 
-    if (error) {
+    if (error)
+    {
         Serial.print("JSON deserialization failed: ");
         Serial.println(error.f_str());
         return;
