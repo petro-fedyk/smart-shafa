@@ -2,7 +2,7 @@
 #define STORAGE_H
 #include <ArduinoJson.h>
 #include <LittleFS.h>
-// TODO: #include <WebserverData.h?cpp> ssid password 
+// TODO: #include <WebserverData.h?cpp> ssid password
 
 class Storage
 {
@@ -10,6 +10,8 @@ private:
     const string *pinPath = "/pin.json";
     const string *wifiPath = "/wifi.json";
     const string *dir = "littleFS";
+    const string *ssid;
+    const string *password;
 
 public:
     Storage();
