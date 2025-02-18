@@ -1,7 +1,7 @@
 #ifndef PIN_H
 #define PIN_N
 
-#define RELAY_PIN 4
+#define TRANSISTOR_PIN 4
 #define DISPLAY_ADDRESS 0x27
 #define KEYPAD_ROWS 4
 #define KEYPAD_COLS 4
