@@ -19,7 +19,7 @@ public:
     Storage &Pin;
     Storage &readPin();
     Storage &writeWiFiData();
-    Storage &readWiFiData(); // we realy need this?
+    Storage &readWiFiData(); // we realy need this? we need to call this function to get ssid and password and connect to thid wifi with it every time whrn it has been powered on
     MyLCD &turnBackLight();
     keyPadControll &isCorrectPin;
     Transistor &on();
