@@ -1,6 +1,12 @@
 #include <Keypad.h>
 #include "keyPadControll.h"
 
+char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
+    {'1', '2', '3', 'A'},
+    {'4', '5', '6', 'B'},
+    {'7', '8', '9', 'C'},
+    {'E', '0', 'F', 'D'}};
+
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
@@ -34,9 +40,8 @@ bool keyPadControll::isCorrectPin()
 void keyPadControll::keyPadLoop() // to do
 {
 
-
     key = isPressed.getKey();
-    
+
     if (key == BTN_CONFIRM)
     {
         if (isCorrectPin())
@@ -57,10 +62,11 @@ void keyPadControll::keyPadLoop() // to do
             lockTime = millis();
             while (millis() - lockTime < 2000)
             {
-                        }
+            }
         }
     }
-    if (key == CHANGE_PIN){
+    if (key == CHANGE_PIN)
+    {
         changePin();
     }
     lcd.clear();

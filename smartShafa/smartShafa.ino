@@ -13,18 +13,18 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-const char *WIFI_SSID = SSID;
-const char *WIFI_PASSWORD = PASSOWORD;
+// const char *WIFI_SSID = SSID;
+// const char *WIFI_PASSWORD = PASSOWORD;
 
-const char *ntpServer1 = NTP_SERVER1;
-const char *ntpServer2 = NTP_SERVER2;
-const long gmtOffset_sec = GTMOFFSET_SEC;
-const int daylightOffset_sec = DAYLIGHTOFFSET;
+// const char *ntpServer1 = NTP_SERVER1;
+// const char *ntpServer2 = NTP_SERVER2;
+// const long gmtOffset_sec = GTMOFFSET_SEC;
+// const int daylightOffset_sec = DAYLIGHTOFFSET;
 
-String apiURL = API_URL;
-String apiKey = API_KEY;
-String latitude = LAT;
-String longitude = LON;
+// String apiURL = API_URL;
+// String apiKey = API_KEY;
+// String latitude = LAT;
+// String longitude = LON;
 
 void setup()
 {

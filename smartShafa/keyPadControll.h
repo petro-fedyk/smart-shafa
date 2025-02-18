@@ -6,6 +6,8 @@
 #include <config.h>
 #include <pin.h>
 
+extern char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS];
+
 class keyPadControll
 {
 private:
