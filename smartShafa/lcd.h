@@ -9,11 +9,15 @@ class MyLCD
 private:
     LiquidCrystal_I2C *lcdData;
 
+    bool state;
+
 public:
     bool backlightState;
     MyLCD(LiquidCrystal_I2C *lcdData);
     void printLcdData();
-    void turnBackLight();
+    void backLightOn();
+    void backLightOff();
+    void toggleBackLight();
 }
 
 #endif
