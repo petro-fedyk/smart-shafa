@@ -15,6 +15,7 @@ private:
     bool changePinMode;
     bool isEnteredPin;
     uint8_t pinIndex;
+    char key;
     Keypad &isPressed;
     Storage &storage;
     LiquidCrystal_I2C &lcd;

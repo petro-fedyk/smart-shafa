@@ -33,6 +33,10 @@ bool keyPadControll::isCorrectPin()
 
 void keyPadControll::keyPadLoop() // to do
 {
+
+
+    key = isPressed.getKey();
+    
     if (key == BTN_CONFIRM)
     {
         if (isCorrectPin())
