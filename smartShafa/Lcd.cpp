@@ -17,7 +17,7 @@ void MyLCD::printLcdData()
 
 void MyLCD::backLightOn()
 {
-    if (state)
+    if (!state)
     {
         lcd.backlight();
         state = true;
@@ -42,6 +42,39 @@ void MyLCD::toggleBackLight()
     else
     {
         backLightOn();
+    }
+}
+
+void lcdMode(lcdState)
+{
+    switch (lcdState)
+    {
+    case 0:
+        lcd.clear();
+        lcd.print("Enter PIN:");
+        break;
+    case 1:
+        lcd.clear();
+        lcd.print("Enter New PIN:");
+        break;
+    case 2:
+        lcd.clear();
+        lcd.print("Confirm New PIN:");
+        break;
+    case 3:
+        lcd.clear();
+        lcd.print("Incorrect PIN!");
+        break;
+    case 4:
+        lcd.clear();
+        lcd.print("Access Granted");
+        break;
+    case 5:
+        lcd.clear();
+        lcd.print("Wrong PIN");
+        break;
+    default:
+        break;
     }
 }
 

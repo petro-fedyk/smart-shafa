@@ -10,6 +10,8 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
+Keypad isPressed = Keypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS);
+
 keyPadControll::keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
 
 bool keyPadControll::isCorrectPin()
@@ -40,38 +42,34 @@ bool keyPadControll::isCorrectPin()
 void keyPadControll::keyPadLoop() // to do
 {
 
-    key = isPressed.getKey();
+    if(key){
+        if (key == BTN_CONFIRM){
+            if (isCorrectPin()){
+                lcd.clear();
+                lcd.print("Access Granted");
+                Transistor.on();
+                lockTime = millis();
+                while (millis() - lockTime < 2000)
+            }else{
 
-    if (key == BTN_CONFIRM)
-    {
-        if (isCorrectPin())
-        {
-            lcd.clear();
-            lcd.print("Access Granted");
-            Transistor.on();
-            lockTime = millis();
-            while (millis() - lockTime < 2000)
-            {
+                lcd.clear();
+                lcd.print("Wrong Code");
+                Transistor.off();
+                lockTime = millis();
+                while (millis() - lockTime < 2000)
+           
             }
         }
-        else
+        if (key == CHANGE_PIN)
         {
-            lcd.clear();
-            lcd.print("Wrong Code");
-            Transistor.off();
-            lockTime = millis();
-            while (millis() - lockTime < 2000)
-            {
-            }
+            changePin();
         }
+        lcd.clear();
     }
-    if (key == CHANGE_PIN)
-    {
-        changePin();
-    }
-    lcd.clear();
+
 }
 
+// to do
 void keyPadControll::changePin()
 {
     static bool waitingForOldPin = true;
@@ -79,6 +77,13 @@ void keyPadControll::changePin()
     static bool waitingForConfirmNewPin = false;
     static char newPin[4];
     static int pinIndex = 0;
+
+    changePinMode = true;
+    lcd.clear();
+    lcd.print("Enter Old Pass:");
+    pinIndex = 0;
+    memset(enteredPin, 0, 4);
+    return;
 
     if (key == BTN_RESET)
     {
@@ -88,17 +93,8 @@ void keyPadControll::changePin()
         waitingForOldPin = true;
         waitingForNewPin = false;
         waitingForConfirmNewPin = false;
-        lcd.clear();
-        return;
-    }
-
-    if (key == CHANGE_PIN)
-    {
-        changePinMode = true;
-        lcd.clear();
-        lcd.print("Enter Old Pass:");
-        pinIndex = 0;
-        memset(enteredPin, 0, 4);
+        lcd.clear()
+        changePinMode = false;
         return;
     }
 

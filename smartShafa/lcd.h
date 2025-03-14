@@ -12,12 +12,14 @@ private:
     bool state;
 
 public:
+    uint8_t lcdState = 0;
     bool backlightState;
     MyLCD(LiquidCrystal_I2C *lcdData);
     void printLcdData();
     void backLightOn();
     void backLightOff();
     void toggleBackLight();
+    void lcdMode(lcdState);
 }
 
 #endif
