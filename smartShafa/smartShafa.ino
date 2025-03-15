@@ -1,10 +1,10 @@
 // #include <LiquidCrystal_I2C.h>
 // #include <Keypad.h>
 // #include "wifiConnect.h"
-#include "keyPadControll.h"
+#include "KeyPadControll.h"
 // #include "clock.h"
 #include "config.h"
-#include "ota.h"
+// #include "ota.h"
 #include "pin.h"
 // #include "security.h"
 #include "transistor.h"
@@ -29,13 +29,15 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 void setup()
 {
     Serial.begin(115200);
-    connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
+    MyLCD.lcdSetup();
+    // connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
 
-    setupOTA("my_esp32", OTA_PIN);
+    // setupOTA("my_esp32", OTA_PIN);
 }
 
 void loop()
 {
+    KeyPadControll.keyPadLoop();
 
-    handleOTA();
+    // handleOTA();
 }

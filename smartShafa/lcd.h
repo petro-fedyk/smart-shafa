@@ -2,7 +2,7 @@
 #define LCD_H
 
 #include <LiquidCrystal_I2C.h>
-#include "keyPadControll.h"
+#include "KeyPadControll.h"
 
 class MyLCD
 {
@@ -12,6 +12,7 @@ private:
     bool state;
 
 public:
+    void lcdSetup();
     bool backlightState;
     MyLCD(LiquidCrystal_I2C *lcdData);
     void printLcdData();

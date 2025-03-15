@@ -1,5 +1,5 @@
 #include <Keypad.h>
-#include "keyPadControll.h"
+#include "KeyPadControll.h"
 
 char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'1', '2', '3', 'A'},
@@ -10,9 +10,9 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
-keyPadControll::keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
+KeyPadControll::KeyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
 
-bool keyPadControll::isCorrectPin()
+bool KeyPadControll::isCorrectPin()
 {
     uint8_t storedPin[4];
     int passwordCount = storage.getPasswordCount();
@@ -37,7 +37,7 @@ bool keyPadControll::isCorrectPin()
     return false;
 }
 
-void keyPadControll::keyPadLoop() // to do
+void KeyPadControll::keyPadLoop() // to do
 {
 
     key = isPressed.getKey();
@@ -72,7 +72,7 @@ void keyPadControll::keyPadLoop() // to do
     lcd.clear();
 }
 
-void keyPadControll::changePin()
+void KeyPadControll::changePin()
 {
     static bool waitingForOldPin = true;
     static bool waitingForNewPin = false;

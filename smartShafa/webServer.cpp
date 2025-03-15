@@ -40,7 +40,7 @@ void WebServer::handleWeb()
         {
             request->send(400, "application/json", "{\"error\":\"Missing value parameter\"}");
         } 
-        if(keyPadControll &isCorrectPin())
+        if(KeyPadControll &isCorrectPin())
         {
             Transistor &on();
         } 

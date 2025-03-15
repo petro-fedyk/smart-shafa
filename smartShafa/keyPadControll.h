@@ -8,11 +8,12 @@
 
 extern char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS];
 
-class keyPadControll
+// ! todo
+class KeyPadControll
 {
 private:
-    char enteredPin[4];
-    char currentPin;
+    char enteredPin[4] = {};
+    char currentPin[4] = "1234";
     bool isCorrectPin;
     bool changePinMode;
     bool isEnteredPin;
@@ -25,7 +26,7 @@ private:
     Transistor &off();
 
 public:
-    keyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
+    KeyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
     bool isCorrectPin();
     void changePin();
     void keyPadLoop();

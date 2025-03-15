@@ -3,11 +3,12 @@
 
 MyLCD::myLcd(*lcdData) : lcdData(lcdData), state(false)
 {
+    this = > lcdData;
+}
+void MyLcd::lcdSetup()
+{
     lcd.init();
     lcd.clear();
-}
-{
-    this = > lcdData;
 }
 void MyLCD::printLcdData()
 {
@@ -45,29 +46,25 @@ void MyLCD::toggleBackLight()
     }
 }
 
-
-
-
-
-//currently not used
-// void MyLCD::turnBackLight()
-// {
-    // backlightState = true;
-    // should be implemented like we made in transistor    
-    // this part must be in keypad handler from which toggle backlight is called
-    // if (key)
-    // {
-    //     if (key == BACKLIGHT)
-    //     {
-    //         backlightState = !backlightState;
-    //         if (backlightState)
-    //         {
-    //             backlight();
-    //         }
-    //         else
-    //         {
-    //             noBacklight();
-    //         }
-    //     }
-    // }
+// currently not used
+//  void MyLCD::turnBackLight()
+//  {
+//  backlightState = true;
+//  should be implemented like we made in transistor
+//  this part must be in keypad handler from which toggle backlight is called
+//  if (key)
+//  {
+//      if (key == BACKLIGHT)
+//      {
+//          backlightState = !backlightState;
+//          if (backlightState)
+//          {
+//              backlight();
+//          }
+//          else
+//          {
+//              noBacklight();
+//          }
+//      }
+//  }
 // }
