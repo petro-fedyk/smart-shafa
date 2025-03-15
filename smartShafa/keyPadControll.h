@@ -24,6 +24,7 @@ private:
     LiquidCrystal_I2C &lcd;
     Transistor &on();
     Transistor &off();
+    char key = isPressed.getKey();
 
 public:
     KeyPadControll(Storage &storage, LiquidCrystal_I2C &lcd);
