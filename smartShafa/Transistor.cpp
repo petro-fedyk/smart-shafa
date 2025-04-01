@@ -24,7 +24,7 @@ void Transistor::off()
     }
 }
 
-void Transistos::toggle()
+void Transistor::toggle()
 {
     if (state)
     {

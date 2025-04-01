@@ -2,23 +2,25 @@
 #define LCD_H
 
 #include <LiquidCrystal_I2C.h>
-#include "KeyPadControll.h"
+#include "keyPadControll.h"
 
 class MyLCD
 {
 private:
     LiquidCrystal_I2C *lcdData;
 
-    bool state;
-
 public:
+    myLcd(LiquidCrystal_I2C *lcdData);
+    bool lcdState;
     bool backlightState;
-    MyLCD(LiquidCrystal_I2C *lcdData);
     void printLcdData();
     void backLightOn();
     void backLightOff();
     void toggleBackLight();
     void lcdMode(lcdState);
+    void showUnlockData();
+    void showClockAndWeather();
+    void lcdSetup();
 }
 
 #endif

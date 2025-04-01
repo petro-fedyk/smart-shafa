@@ -1,7 +1,7 @@
 // #include <LiquidCrystal_I2C.h>
 // #include <Keypad.h>
 // #include "wifiConnect.h"
-#include "KeyPadControll.h"
+#include "keyPadControll.h"
 // #include "clock.h"
 #include "config.h"
 // #include "ota.h"

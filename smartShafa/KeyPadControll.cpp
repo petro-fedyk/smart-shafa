@@ -1,5 +1,6 @@
 #include <Keypad.h>
-#include "KeyPadControll.h"
+#include "keyPadControll.h"
+#define TouchTime 20000
 
 char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'1', '2', '3', 'A'},
@@ -71,7 +72,7 @@ void KeyPadControll::keyPadLoop() // to do
         lcd.clear();
     }
 
-    void keyPadControll::changePin()
+    void KeyPadControll::changePin()
     {
         static bool waitingForOldPin = true;
         static bool waitingForNewPin = false;
@@ -162,3 +163,17 @@ void KeyPadControll::keyPadLoop() // to do
             }
         }
     }
+}
+
+void KeyPadControll::changeCase()
+{
+    if (key)
+    {
+        MyLCD.lcdState = 0;
+        lastTouchTime = millis();
+    }
+    if (millis() - lastTouchTime >= TouchTime)
+    {
+        MyLCD.lcdState = 1;
+    }
+}
