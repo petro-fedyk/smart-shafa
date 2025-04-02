@@ -7,7 +7,8 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'7', '8', '9', 'C'},
     {'E', '0', 'F', 'D'}};
 
-const char initialPassword[PASSWORD_LENGTH] = {'1', '2', '3', '4'};
+// const char initialPassword[PASSWORD_LENGTH] = {'1', '2', '3', '4'};
+const String PIN = "1234";
 
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
@@ -131,27 +132,28 @@ void KeyPadControl::keyPadLoop()
 
 bool KeyPadControl::isUnlockCodeCorrect()
 {
-  uint8_t storedPin[4];
-  bool match = true;
-
+  String enteredPassword = "";
   for (int i = 0; i < PASSWORD_LENGTH; i++)
   {
-    for (int j = 0; j < PASSWORD_LENGTH; j++)
-    {
-      if (enteredPin[i] != initialPassword[j])
-      {
-        match = false;
-        Serial.println("false pin");
-        break;
-      }
-    }
-    if (match)
-    {
-      return true;
-      Serial.println("true pin");
-    }
+    enteredPassword += char(enteredPin[i]);
   }
-  return false;
+
+  Serial.print("Entered password: ");
+  Serial.println(enteredPassword);
+
+  Serial.print("Stored password: ");
+  Serial.println(PIN);
+
+  if (enteredPassword == PIN)
+  {
+    Serial.println("true pin");
+    return true;
+  }
+  else
+  {
+    Serial.println("false pin");
+    return false;
+  }
 }
 
 void KeyPadControl::clearPin()
