@@ -93,13 +93,14 @@ void KeyPadControl::keyPadLoop()
     {
       if (isUnlockCodeCorrect())
       {
-        lcd.clear();
-        lcd.print("Access Granted");
+        //lcd.clear();
+        //lcd.print("Access Granted");
+        
       }
       else
       {
-        lcd.clear();
-        lcd.print("Wrong Code");
+        //lcd.clear();
+        //lcd.print("Wrong Code");
       }
       clearPin();
     }

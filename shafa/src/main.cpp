@@ -5,13 +5,16 @@
 #include "pin.h"
 #include "transistor.h"
 
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+KeyPadControl keyPadControl(lcd);
+
 void setup()
 {
   Serial.begin(115200);
-  KeyPadControl.keyPadSetup();
+  keyPadControl.keyPadSetup();
 }
 
 void loop()
 {
-  KeyPadControl.keyPadLoop();
+  keyPadControl.keyPadLoop();
 }
