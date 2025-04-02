@@ -11,6 +11,7 @@ uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
 KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd)
+: customKeypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS), lcd(lcd), pinIndex(0), changePasswordMode(false), changePasswordStage(0)
 {
   clearPin();
 }
