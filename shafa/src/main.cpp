@@ -12,6 +12,10 @@ void setup()
 {
   Serial.begin(115200);
   keyPadControl.keyPadSetup();
+  Serial.println("Setup complete");
+  pinMode(TRANSISTOR_PIN, OUTPUT);
+  digitalWrite(TRANSISTOR_PIN, LOW); // Вимкнути транзистор
+  Serial.println("Transistor pin set to LOW");
 }
 
 void loop()

@@ -7,11 +7,13 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'7', '8', '9', 'C'},
     {'E', '0', 'F', 'D'}};
 
+const char initialPassword[PASSWORD_LENGTH] = {'1', '2', '3', '4'};
+
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
 KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd)
-: customKeypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS), lcd(lcd), pinIndex(0), changePasswordMode(false), changePasswordStage(0)
+    : customKeypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS), lcd(lcd), pinIndex(0), changePasswordMode(false), changePasswordStage(0)
 {
   clearPin();
 }
@@ -21,6 +23,7 @@ void KeyPadControl::keyPadSetup()
   lcd.init();
   lcd.backlight();
   clearPin();
+  Serial.println("KeyPad Setup complete");
 }
 
 void KeyPadControl::keyPadLoop()
@@ -93,14 +96,13 @@ void KeyPadControl::keyPadLoop()
     {
       if (isUnlockCodeCorrect())
       {
-        //lcd.clear();
-        //lcd.print("Access Granted");
-        
+        lcd.clear();
+        lcd.print("Access Granted");
       }
       else
       {
-        //lcd.clear();
-        //lcd.print("Wrong Code");
+        lcd.clear();
+        lcd.print("Wrong Code");
       }
       clearPin();
     }
@@ -129,8 +131,27 @@ void KeyPadControl::keyPadLoop()
 
 bool KeyPadControl::isUnlockCodeCorrect()
 {
-  // Реалізація перевірки коду
-  return true; // Заглушка
+  uint8_t storedPin[4];
+  bool match = true;
+
+  for (int i = 0; i < PASSWORD_LENGTH; i++)
+  {
+    for (int j = 0; j < PASSWORD_LENGTH; j++)
+    {
+      if (enteredPin[i] != initialPassword[j])
+      {
+        match = false;
+        Serial.println("false pin");
+        break;
+      }
+    }
+    if (match)
+    {
+      return true;
+      Serial.println("true pin");
+    }
+  }
+  return false;
 }
 
 void KeyPadControl::clearPin()
