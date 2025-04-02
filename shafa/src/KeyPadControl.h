@@ -5,6 +5,7 @@
 #include <LiquidCrystal_I2C.h>
 #include "config.h"
 #include "pin.h"
+#include "storage.h"
 
 class KeyPadControl
 {
@@ -16,9 +17,10 @@ private:
     bool changePasswordMode;
     uint8_t changePasswordStage;
     uint8_t tempPin[4];
+    Storage &storage;
 
 public:
-    KeyPadControl(LiquidCrystal_I2C &lcd); // Оголошення конструктора з посиланням
+    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage); // Оголошення конструктора з посиланням
     void keyPadSetup();
     void keyPadLoop();
     bool isUnlockCodeCorrect();

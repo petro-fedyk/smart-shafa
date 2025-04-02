@@ -4,9 +4,11 @@
 #include "config.h"
 #include "pin.h"
 #include "transistor.h"
+#include "storage.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
-KeyPadControl keyPadControl(lcd);
+Storage storage;
+KeyPadControl keyPadControl(lcd, storage);
 
 void setup()
 {
