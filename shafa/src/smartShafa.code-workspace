@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../smartShafa"
+		},
+		{
+			"name": "shafa",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"memory": "cpp",
+			"functional": "cpp",
+			"type_traits": "cpp",
+			"compare": "cpp"
+		}
+	}
+}
