@@ -7,17 +7,17 @@
 class Storage
 {
 private:
-    const String pinPath = "/pin.json";
-    const String wifiPath = "/wifi.json";
-    const String dir = "littleFS";
+    const String pinPath = "/pin.txt";
     // String ssid;
     // String password;
 
 public:
     Storage();
+    void StorageSetup();
     String pin;
-    void readPin();
-    // void writePin(String &newPin);
+    String readPin();
+    String readedPin;
+    void writePin(String &confirmPin);
     // void deletePin();
     // void checkFolder(const char *path);
     // void writeWiFiData();

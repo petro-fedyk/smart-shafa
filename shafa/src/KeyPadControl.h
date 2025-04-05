@@ -16,8 +16,9 @@ private:
 
     bool changePasswordMode;
     uint8_t changePasswordStage;
-    uint8_t tempPin[4];
+    String tempPin;
     Storage &storage;
+    String readedPin;
 
 public:
     KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage); // Оголошення конструктора з посиланням
@@ -26,7 +27,8 @@ public:
     bool isUnlockCodeCorrect();
     void clearPin();
     Keypad customKeypad;
-    bool isKeyPressed; // Просто оголошення змінної
+    bool isKeyPressed;
+    bool openTransistor;
 };
 
 #endif

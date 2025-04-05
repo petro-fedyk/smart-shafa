@@ -6,49 +6,21 @@
 #include "transistor.h"
 #include "storage.h"
 
+#define UNLOCL_TIME 2000
+const unsigned long currentTime = 0;
+
+void unlock();
+
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Storage storage;
 KeyPadControl keyPadControl(lcd, storage);
+// Transistor Transistor(uint8_t pin);
 
 void setup()
 {
   Serial.begin(115200);
 
-  if (!LittleFS.begin(true))
-  {
-    Serial.println("An Error has occurred while mounting LittleFS");
-    return;
-  }
-
-  File file = LittleFS.open("/text.txt", "r");
-  if (!file)
-  {
-    Serial.println("File not found, creating new one...");
-    file = LittleFS.open("/text.txt", "w");
-    if (file)
-    {
-      file.println("1234");
-      file.close();
-      Serial.println("File created");
-    }
-    else
-    {
-      Serial.println("Failed to create file");
-    }
-  }
-
-  if (!file)
-  {
-    Serial.println("Failed to open file for reading");
-    return;
-  }
-
-  Serial.println("File Content:");
-  while (file.available())
-  {
-    Serial.write(file.read());
-  }
-  file.close();
+  storage.StorageSetup();
 
   keyPadControl.keyPadSetup();
   Serial.println("Setup complete");
@@ -61,3 +33,15 @@ void loop()
 {
   keyPadControl.keyPadLoop();
 }
+
+// void unlock()
+// {
+//   if (keyPadControl.openTransistor)
+//   {
+//     if (currentTime - millis() >= UNLOCL_TIME)
+//     {
+//       millis();
+//       Transistor.on();
+//     }
+//   }
+// }

@@ -8,7 +8,7 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'E', '0', 'F', 'D'}};
 
 // const char initialPassword[PASSWORD_LENGTH] = {'1', '2', '3', '4'};
-const String PIN = "1234";
+// const String PIN = "1234";
 
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
@@ -35,100 +35,95 @@ void KeyPadControl::keyPadSetup()
 void KeyPadControl::keyPadLoop()
 {
   char key = customKeypad.getKey();
-  isKeyPressed = (key != NO_KEY); // Оновлення змінної isKeyPressed
+  isKeyPressed = (key != NO_KEY);
 
-  if (key)
+  if (key == 'D')
   {
-    if (key == 'C')
-    {
-      storage.readPin();
-    }
+    ESP.restart();
+  }
 
-    if (key == CHANGE_PIN)
-    {
-      changePasswordMode = true;
-      lcd.clear();
-      lcd.print("Enter Old Pass:");
-      pinIndex = 0;
-      return;
-    }
+  if (key == CHANGE_PIN)
+  {
+    changePasswordMode = true;
+    lcd.clear();
+    lcd.print("Enter Old Pass:");
+    Serial.println("Change password mode activated");
+    clearPin();
+    return;
+  }
 
-    if (changePasswordMode)
+  if (changePasswordMode)
+  {
+    if (key == BTN_CONFIRM)
     {
-      if (key == BTN_CONFIRM)
+      if (pinIndex == PASSWORD_LENGTH && changePasswordStage == 0 && isUnlockCodeCorrect())
       {
-        if (pinIndex == PASSWORD_LENGTH && isUnlockCodeCorrect())
+        lcd.clear();
+        lcd.print("Enter New Pass:");
+        clearPin();
+        changePasswordStage = 1;
+      }
+      else if (changePasswordStage == 1 && pinIndex == PASSWORD_LENGTH)
+      {
+        tempPin = "";
+        for (uint8_t i = 0; i < PASSWORD_LENGTH; i++)
         {
-          lcd.clear();
-          lcd.print("Enter New Pass:");
-          pinIndex = 0;
-          changePasswordStage = 1;
+          tempPin += char(enteredPin[i]);
         }
-        else if (changePasswordStage == 1 && pinIndex == PASSWORD_LENGTH)
+        lcd.clear();
+        lcd.print("Confirm New Pass:");
+        clearPin();
+        changePasswordStage = 2;
+      }
+      else if (changePasswordStage == 2 && pinIndex == PASSWORD_LENGTH)
+      {
+        String confirmPin = "";
+        for (uint8_t i = 0; i < PASSWORD_LENGTH; i++)
         {
-          memcpy(tempPin, enteredPin, PASSWORD_LENGTH);
+          confirmPin += char(enteredPin[i]);
+        }
+
+        if (tempPin == confirmPin)
+        {
+          Serial.println("Password changed successfully");
+          storage.writePin(confirmPin);
+          Serial.print("New PIN: ");
+          Serial.println(confirmPin);
+
           lcd.clear();
-          lcd.print("Confirm New Pass:");
-          pinIndex = 0;
-          changePasswordStage = 2;
+          lcd.print("Pass Changed");
+          clearPin();
         }
         else
         {
           lcd.clear();
-          lcd.print("Wrong Pass");
+          lcd.print("Mismatch");
+          Serial.println("Password confirmation mismatch");
           clearPin();
-          changePasswordMode = false;
         }
-      }
-      else if (key == BTN_RESET)
-      {
         clearPin();
-      }
-      else
-      {
-        if (pinIndex < sizeof(enteredPin) / sizeof(enteredPin[0]))
-        {
-          enteredPin[pinIndex++] = key;
-
-          String pinDisplay = "";
-          for (int i = 0; i < pinIndex; i++)
-          {
-            pinDisplay += char(enteredPin[i]);
-          }
-
-          lcd.setCursor(0, 1);
-          lcd.print(pinDisplay);
-        }
-      }
-      return;
-    }
-
-    if (key == BTN_CONFIRM)
-    {
-      if (isUnlockCodeCorrect())
-      {
-        lcd.clear();
-        lcd.print("Access Granted");
+        changePasswordMode = false;
       }
       else
       {
         lcd.clear();
-        lcd.print("Wrong Code");
+        lcd.print("Wrong Pass");
+        clearPin();
+        changePasswordMode = false;
       }
-      clearPin();
     }
     else if (key == BTN_RESET)
     {
       clearPin();
     }
-    else
+    else if (key != NO_KEY)
     {
-      if (pinIndex < sizeof(enteredPin) / sizeof(enteredPin[0]))
+      if (pinIndex < PASSWORD_LENGTH)
       {
         enteredPin[pinIndex++] = key;
 
         String pinDisplay = "";
-        for (int i = 0; i < pinIndex; i++)
+        for (uint8_t i = 0; i < pinIndex; i++)
         {
           pinDisplay += char(enteredPin[i]);
         }
@@ -137,11 +132,52 @@ void KeyPadControl::keyPadLoop()
         lcd.print(pinDisplay);
       }
     }
+    return;
+  }
+
+  if (key == BTN_CONFIRM)
+  {
+    if (isUnlockCodeCorrect())
+    {
+      lcd.clear();
+      openTransistor = true;
+      lcd.print("Access Granted");
+      Serial.println("Access Granted");
+    }
+    else
+    {
+      lcd.clear();
+      lcd.print("Wrong Code");
+      Serial.println("Wrong Code");
+    }
+    clearPin();
+  }
+  else if (key == BTN_RESET)
+  {
+    clearPin();
+  }
+  else if (key != NO_KEY)
+  {
+    if (pinIndex < PASSWORD_LENGTH)
+    {
+      enteredPin[pinIndex++] = key;
+
+      String pinDisplay = "";
+      for (uint8_t i = 0; i < pinIndex; i++)
+      {
+        pinDisplay += char(enteredPin[i]);
+      }
+
+      lcd.setCursor(0, 1);
+      lcd.print(pinDisplay);
+    }
   }
 }
 
 bool KeyPadControl::isUnlockCodeCorrect()
 {
+  readedPin = storage.readPin();
+
   String enteredPassword = "";
   for (int i = 0; i < PASSWORD_LENGTH; i++)
   {
@@ -152,9 +188,9 @@ bool KeyPadControl::isUnlockCodeCorrect()
   Serial.println(enteredPassword);
 
   Serial.print("Stored password: ");
-  Serial.println(PIN);
+  Serial.println(readedPin);
 
-  if (enteredPassword == PIN)
+  if (enteredPassword == readedPin)
   {
     Serial.println("true pin");
     return true;
@@ -168,7 +204,9 @@ bool KeyPadControl::isUnlockCodeCorrect()
 
 void KeyPadControl::clearPin()
 {
-  memset(enteredPin, 0, sizeof(enteredPin));
+  String confirmPin = "";
+  String pinDisplay = "";
+
   pinIndex = 0;
   lcd.clear();
   lcd.setCursor(0, 0);
