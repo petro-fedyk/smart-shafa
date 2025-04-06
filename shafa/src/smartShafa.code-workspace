@@ -13,7 +13,8 @@
 			"memory": "cpp",
 			"functional": "cpp",
 			"type_traits": "cpp",
-			"compare": "cpp"
+			"compare": "cpp",
+			"mutex": "cpp"
 		}
 	}
 }

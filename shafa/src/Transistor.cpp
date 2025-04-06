@@ -1,6 +1,8 @@
 #include "transistor.h"
 
-Transistor::Transistor(uint8_t) : pin(pin), state(false)
+#define UNLOCL_TIME 2000
+
+Transistor::Transistor(uint8_t pin) : pin(pin), state(false), currentTime(0)
 {
     pinMode(pin, OUTPUT);
     off();
@@ -8,7 +10,7 @@ Transistor::Transistor(uint8_t) : pin(pin), state(false)
 
 void Transistor::on()
 {
-    if (state)
+    if (!state)
     {
         digitalWrite(pin, HIGH);
         state = true;
@@ -19,7 +21,7 @@ void Transistor::off()
 {
     if (state)
     {
-        digitalWrite(pin, HIGH);
+        digitalWrite(pin, LOW);
         state = false;
     }
 }
@@ -39,4 +41,30 @@ void Transistor::toggle()
 bool Transistor::getState()
 {
     return state;
+}
+
+void Transistor::unlock()
+{
+    unsigned long now = millis();
+
+    if (!state)
+    {
+        on();
+        currentTime = now;
+    }
+    else if (now - currentTime >= UNLOCL_TIME)
+    {
+        off();
+        TransistorOpen = false; // Скидаємо прапорець після вимкнення
+    }
+}
+
+void Transistor::setTransistorOpen(bool state)
+{
+    TransistorOpen = state;
+}
+
+bool Transistor::isTransistorOpen() const
+{
+    return TransistorOpen;
 }

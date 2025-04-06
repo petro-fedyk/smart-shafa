@@ -3,6 +3,7 @@
 
 #include <Keypad.h>
 #include <LiquidCrystal_I2C.h>
+#include "transistor.h"
 #include "config.h"
 #include "pin.h"
 #include "storage.h"
@@ -13,7 +14,7 @@ private:
     uint8_t enteredPin[4];
     uint8_t pinIndex;
     LiquidCrystal_I2C &lcd;
-
+    Transistor &transistor;
     bool changePasswordMode;
     uint8_t changePasswordStage;
     String tempPin;
@@ -21,14 +22,14 @@ private:
     String readedPin;
 
 public:
-    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage); // Оголошення конструктора з посиланням
+    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor); // Оголошення конструктора з посиланням
+
     void keyPadSetup();
     void keyPadLoop();
     bool isUnlockCodeCorrect();
     void clearPin();
     Keypad customKeypad;
     bool isKeyPressed;
-    bool openTransistor;
 };
 
 #endif

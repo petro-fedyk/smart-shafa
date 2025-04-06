@@ -13,10 +13,11 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
-KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage)
+KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor)
     : customKeypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS),
       lcd(lcd),
-      storage(storage), // Ініціалізуємо storage
+      storage(storage),
+      transistor(transistor), // Ініціалізуємо посилання на Transistor
       pinIndex(0),
       changePasswordMode(false),
       changePasswordStage(0)
@@ -140,7 +141,8 @@ void KeyPadControl::keyPadLoop()
     if (isUnlockCodeCorrect())
     {
       lcd.clear();
-      openTransistor = true;
+      // unlock.unlock();
+      transistor.setTransistorOpen(true);
       lcd.print("Access Granted");
       Serial.println("Access Granted");
     }
