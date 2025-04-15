@@ -13,11 +13,12 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
-KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor)
+KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &clock)
     : customKeypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS),
       lcd(lcd),
       storage(storage),
-      transistor(transistor), // Ініціалізуємо посилання на Transistor
+      transistor(transistor),
+      clock(clock),
       pinIndex(0),
       changePasswordMode(false),
       changePasswordStage(0)
@@ -27,6 +28,7 @@ KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transisto
 
 void KeyPadControl::keyPadSetup()
 {
+
   lcd.init();
   lcd.backlight();
   clearPin();
@@ -38,9 +40,30 @@ void KeyPadControl::keyPadLoop()
   char key = customKeypad.getKey();
   isKeyPressed = (key != NO_KEY);
 
-  if (key == 'D')
+  if (key == BTN_REBOOT)
   {
-    ESP.restart();
+    // ESP.restart();
+    esp_restart();
+  }
+  if (key == BTN_BACKLIGHT)
+  {
+    backlight = !backlight;
+
+    if (backlight)
+    {
+      lcd.backlight();
+    }
+    else
+    {
+      lcd.noBacklight();
+    }
+
+    return;
+  }
+
+  if (key == 'C')
+  {
+    clock.showClock();
   }
 
   if (key == CHANGE_PIN)
@@ -145,12 +168,14 @@ void KeyPadControl::keyPadLoop()
       transistor.setTransistorOpen(true);
       lcd.print("Access Granted");
       Serial.println("Access Granted");
+      clearPin();
     }
     else
     {
       lcd.clear();
       lcd.print("Wrong Code");
       Serial.println("Wrong Code");
+      clearPin();
     }
     clearPin();
   }
@@ -208,6 +233,12 @@ void KeyPadControl::clearPin()
 {
   String confirmPin = "";
   String pinDisplay = "";
+  // String enteredPin = "";
+
+  for (uint8_t i = 0; i < PASSWORD_LENGTH; i++)
+  {
+    enteredPin[i] = 0;
+  }
 
   pinIndex = 0;
   lcd.clear();

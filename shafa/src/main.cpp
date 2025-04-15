@@ -5,15 +5,28 @@
 #include "pin.h"
 #include "transistor.h"
 #include "storage.h"
+#include "wifiConnect.h"
+#include "clock.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Storage storage;
-Transistor transistor(TRANSISTOR_PIN); // Створюємо об'єкт Transistor
-KeyPadControl keyPadControl(lcd, storage, transistor);
+Transistor transistor(TRANSISTOR_PIN);
+MyClock myClock(&lcd, 72000, 3600, "pool.ntp.org", "time.nist.gov"); // Змінили ім'я об'єкта
+KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
+
+const char *WIFI_SSID = "admin";
+const char *WIFI_PASSWORD = "domestos1216";
+
+const char *ntpServer1 = "pool.ntp.org";
+const char *ntpServer2 = "time.nist.gov";
+const long gmtOffset_sec = 72000;
+const int daylightOffset_sec = 3600;
 
 void setup()
 {
   Serial.begin(115200);
+
+  connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
 
   storage.StorageSetup();
 
@@ -24,11 +37,12 @@ void setup()
 void loop()
 {
   keyPadControl.keyPadLoop();
-  // unlock();
   if (transistor.isTransistorOpen())
   {
-    transistor.unlock(); // Викликаємо функцію unlock() для керування транзистором
+    transistor.unlock();
+  }
+  if (myClock.isClockShow)
+  {
+    myClock.updateClock();
   }
 }
-
-// дати функцію в транзисторі викликати коли треба відкрити двері

@@ -1,11 +1,16 @@
 {
 	"folders": [
 		{
+			"name": "smartShafa",
 			"path": "../../smartShafa"
 		},
 		{
 			"name": "shafa",
 			"path": ".."
+		},
+		{
+			"name": "clock",
+			"path": "../../../clock"
 		}
 	],
 	"settings": {

@@ -7,6 +7,7 @@
 #include "config.h"
 #include "pin.h"
 #include "storage.h"
+#include "clock.h"
 
 class KeyPadControl
 {
@@ -20,15 +21,17 @@ private:
     String tempPin;
     Storage &storage;
     String readedPin;
+    MyClock &clock;
 
 public:
-    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor); // Оголошення конструктора з посиланням
+    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &clock); // Оголошення конструктора з посиланням
 
     void keyPadSetup();
     void keyPadLoop();
     bool isUnlockCodeCorrect();
     void clearPin();
     Keypad customKeypad;
+    bool backlight = true;
     bool isKeyPressed;
 };
 
