@@ -1,5 +1,6 @@
 #include "KeyPadControl.h"
 #include "config.h"
+#define WAIT_TIME 5000
 
 char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'1', '2', '3', 'A'},
@@ -61,9 +62,25 @@ void KeyPadControl::keyPadLoop()
     return;
   }
 
-  if (key == 'C')
+  if (key)
   {
-    clock.showClock();
+    lastKeyPressTime = millis();
+
+    if (clock.isClockShow)
+    {
+      clock.isClockShow = false;
+      clearPin();
+    }
+  }
+
+  if (millis() - lastKeyPressTime > WAIT_TIME)
+  {
+    if (!clock.isClockShow)
+    {
+      Serial.println("No activity detected. Switching to clock mode...");
+      clock.showClock();
+    }
+    return;
   }
 
   if (key == CHANGE_PIN)

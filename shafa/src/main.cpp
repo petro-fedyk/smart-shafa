@@ -7,26 +7,30 @@
 #include "storage.h"
 #include "wifiConnect.h"
 #include "clock.h"
+#include "ota.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 Storage storage;
 Transistor transistor(TRANSISTOR_PIN);
-MyClock myClock(&lcd, 72000, 3600, "pool.ntp.org", "time.nist.gov"); // Змінили ім'я об'єкта
+
+const char *ntpServer1 = "pool.ntp.org"; // Переміщено перед створенням myClock
+const char *ntpServer2 = "time.nist.gov";
+const long gmtOffset_sec = 7200;
+const int daylightOffset_sec = 3600;
+
+MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, ntpServer1, ntpServer2); // Передаємо значення// Тепер змінні доступні
 KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
 
 const char *WIFI_SSID = "admin";
 const char *WIFI_PASSWORD = "domestos1216";
-
-const char *ntpServer1 = "pool.ntp.org";
-const char *ntpServer2 = "time.nist.gov";
-const long gmtOffset_sec = 72000;
-const int daylightOffset_sec = 3600;
 
 void setup()
 {
   Serial.begin(115200);
 
   connectToWiFi(WIFI_SSID, WIFI_PASSWORD);
+  setupOTA("my_esp32", OTA_PIN);
+  myClock.initClock();
 
   storage.StorageSetup();
 
@@ -45,4 +49,5 @@ void loop()
   {
     myClock.updateClock();
   }
+  handleOTA();
 }

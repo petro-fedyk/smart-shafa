@@ -22,6 +22,7 @@ private:
     Storage &storage;
     String readedPin;
     MyClock &clock;
+    unsigned long lastKeyPressTime = 0;
 
 public:
     KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &clock); // Оголошення конструктора з посиланням
