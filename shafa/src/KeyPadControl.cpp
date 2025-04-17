@@ -181,8 +181,7 @@ void KeyPadControl::keyPadLoop()
     if (isUnlockCodeCorrect())
     {
       lcd.clear();
-      // unlock.unlock();
-      transistor.setTransistorOpen(true);
+      transistor.unlock();
       lcd.print("Access Granted");
       Serial.println("Access Granted");
       clearPin();

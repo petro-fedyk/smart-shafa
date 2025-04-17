@@ -24,7 +24,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  connectToWiFi(SSID, PASSOWORD);
+  connectToWiFi(WIFI_SSID, PASSOWORD);
   setupOTA("my_esp32", OTA_PIN);
   myClock.initClock();
 

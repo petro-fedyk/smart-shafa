@@ -1,6 +1,6 @@
 #include "transistor.h"
 
-#define UNLOCL_TIME 2000
+#define UNLOCK_TIME 2000
 
 Transistor::Transistor(uint8_t pin) : pin(pin), state(false), currentTime(0)
 {
@@ -26,18 +26,6 @@ void Transistor::off()
     }
 }
 
-void Transistor::toggle()
-{
-    if (state)
-    {
-        off();
-    }
-    else
-    {
-        on();
-    }
-}
-
 bool Transistor::getState()
 {
     return state;
@@ -45,26 +33,15 @@ bool Transistor::getState()
 
 void Transistor::unlock()
 {
-    unsigned long now = millis();
+    u_int64_t now = millis();
 
     if (!state)
     {
         on();
         currentTime = now;
     }
-    else if (now - currentTime >= UNLOCL_TIME)
+    else if (now - currentTime >= UNLOCK_TIME)
     {
         off();
-        TransistorOpen = false; // Скидаємо прапорець після вимкнення
     }
-}
-
-void Transistor::setTransistorOpen(bool state)
-{
-    TransistorOpen = state;
-}
-
-bool Transistor::isTransistorOpen() const
-{
-    return TransistorOpen;
 }

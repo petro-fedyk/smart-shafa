@@ -1,8 +1,8 @@
 #ifndef SECURITY_H
 #define SECURITY_H
 
-//#define SSID "611VVA"
-#define SSID "__MY__VAULT__"
+//#define WIFI_SSID "611VVA"
+#define WIFI_SSID "__MY__VAULT__"
 //#define PASSOWORD "123qwerty9"
 #define PASSOWORD "79715218"
 #define NTP_SERVER1 "pool.ntp.org"

@@ -9,14 +9,10 @@ public:
     Transistor(uint8_t pin);
     void on();
     void off();
-    void toggle();
     bool getState();
     void unlock();
 
-    // Методи для роботи з прапорцем TransistorOpen
     void setTransistorOpen(bool state);
-    bool isTransistorOpen() const;
-
 private:
     uint8_t pin;
     bool state;
