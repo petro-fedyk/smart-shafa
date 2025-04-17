@@ -2,6 +2,7 @@
 #define TRANSISTOR_H
 
 #include <Arduino.h>
+#include "security.h"
 
 class Transistor
 {
@@ -11,13 +12,12 @@ public:
     void off();
     bool getState();
     void unlock();
-
-    void setTransistorOpen(bool state);
+    void handleUnlock();
+    uint16_t UNLOCK_TIME = 2000;
 private:
     uint8_t pin;
     bool state;
-    unsigned long currentTime = 0;
-    bool TransistorOpen = false; // Прапорець для контролю стану
+    uint32_t currentTime = 0;
 };
 
 #endif

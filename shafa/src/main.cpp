@@ -23,8 +23,9 @@ KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
 void setup()
 {
   Serial.begin(115200);
-
-  connectToWiFi(WIFI_SSID, PASSOWORD);
+  Serial.println(WIFI_SSID);
+  Serial.println(PASSWORD);
+  connectToWiFi(WIFI_SSID, PASSWORD);
   setupOTA("my_esp32", OTA_PIN);
   myClock.initClock();
 
@@ -36,6 +37,7 @@ void setup()
 
 void loop()
 {
+  transistor.handleUnlock();
   keyPadControl.keyPadLoop();
   if (myClock.isClockShow)
   {

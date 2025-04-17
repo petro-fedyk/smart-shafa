@@ -1,7 +1,5 @@
 #include "transistor.h"
 
-#define UNLOCK_TIME 2000
-
 Transistor::Transistor(uint8_t pin) : pin(pin), state(false), currentTime(0)
 {
     pinMode(pin, OUTPUT);
@@ -33,14 +31,15 @@ bool Transistor::getState()
 
 void Transistor::unlock()
 {
-    u_int64_t now = millis();
-
     if (!state)
     {
         on();
-        currentTime = now;
+        currentTime = millis();
     }
-    else if (now - currentTime >= UNLOCK_TIME)
+}
+
+void Transistor::handleUnlock(){
+    if (state && (millis() - currentTime >= UNLOCK_TIME))
     {
         off();
     }

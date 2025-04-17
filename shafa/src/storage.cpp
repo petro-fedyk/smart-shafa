@@ -8,12 +8,25 @@ Storage::Storage()
 
 void Storage::StorageSetup()
 {
-    if (!LittleFS.begin(true))
+    if (!LittleFS.begin(true, "/littlefs", 10U, "littlefs"))
     {
         Serial.println("An Error has occurred while mounting LittleFS");
         return;
     }
+    File root = LittleFS.open("/");
+    if (!root || !root.isDirectory())
+    {
+        Serial.println("Failed to open directory");
+        return;
+    }
 
+    File file = root.openNextFile();
+    while (file)
+    {
+        Serial.print("FILE: ");
+        Serial.println(file.name());
+        file = root.openNextFile();
+    }
     readPin();
 }
 

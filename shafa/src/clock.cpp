@@ -104,7 +104,7 @@ void MyClock::displayTime(int hours, int minutes)
 
 void MyClock::updateClock()
 {
-    Serial.println("Updating clock..."); // Лог для початку оновлення годинника
+    //Serial.println("Updating clock..."); // Лог для початку оновлення годинника
 
     struct tm timeinfo;
     if (getLocalTime(&timeinfo))
@@ -112,10 +112,10 @@ void MyClock::updateClock()
         int hours = timeinfo.tm_hour;
         int minutes = timeinfo.tm_min;
 
-        Serial.print("Current time: ");
-        Serial.print(hours);
-        Serial.print(":");
-        Serial.println(minutes);
+        //Serial.print("Current time: ");
+        //Serial.print(hours);
+        //Serial.print(":");
+        //Serial.println(minutes);
 
         displayTime(hours, minutes); // Відображаємо час
     }

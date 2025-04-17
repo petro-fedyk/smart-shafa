@@ -3,8 +3,8 @@
 
 //#define WIFI_SSID "611VVA"
 #define WIFI_SSID "__MY__VAULT__"
-//#define PASSOWORD "123qwerty9"
-#define PASSOWORD "79715218"
+//#define PASSWORD "123qwerty9"
+#define PASSWORD "79715218"
 #define NTP_SERVER1 "pool.ntp.org"
 #define NTP_SERVER2 "time.nist.gov"
 #define GTMOFFSET_SEC 72000
