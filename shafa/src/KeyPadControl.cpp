@@ -126,6 +126,7 @@ void KeyPadControl::keyPadLoop()
 
         if (tempPin == confirmPin)
         {
+          // * currently works but plz FIXME
           Serial.println("Password changed successfully");
           storage.writePin(confirmPin);
           Serial.print("New PIN: ");
@@ -134,6 +135,9 @@ void KeyPadControl::keyPadLoop()
           lcd.clear();
           lcd.print("Pass Changed");
           clearPin();
+          tempPin = "";
+          confirmPin = "";
+          changePasswordStage = 0;
         }
         else
         {
@@ -249,7 +253,6 @@ void KeyPadControl::clearPin()
 {
   String confirmPin = "";
   String pinDisplay = "";
-  // String enteredPin = "";
 
   for (uint8_t i = 0; i < PASSWORD_LENGTH; i++)
   {
