@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Keypad.h>
 #include "security.h"
+#include "lcd.h"
 #include "KeyPadControl.h"
 #include "config.h"
 #include "pin.h"
@@ -10,7 +11,9 @@
 #include "clock.h"
 #include "ota.h"
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LCD lcd(0x27, 16, 2);
+
+//LiquidCrystal_I2C lcd(0x27, 16, 2);
 Storage storage;
 Transistor transistor(TRANSISTOR_PIN);
 
