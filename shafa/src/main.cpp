@@ -1,7 +1,8 @@
 #include <Arduino.h>
 #include <Keypad.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 #include "security.h"
-#include "lcd.h"
 #include "KeyPadControl.h"
 #include "config.h"
 #include "pin.h"
@@ -11,9 +12,9 @@
 #include "clock.h"
 #include "ota.h"
 
-LCD lcd(0x27, 16, 2);
 
-//LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
 Storage storage;
 Transistor transistor(TRANSISTOR_PIN);
 
@@ -26,10 +27,14 @@ KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
 void setup()
 {
   Serial.begin(115200);
+  Wire.begin();
   Serial.println(WIFI_SSID);
   Serial.println(PASSWORD);
   connectToWiFi(WIFI_SSID, PASSWORD);
   setupOTA("my_esp32", OTA_PIN);
+
+  //screenInit();
+
   myClock.initClock();
 
   storage.StorageSetup();

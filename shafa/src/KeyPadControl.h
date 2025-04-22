@@ -21,18 +21,20 @@ private:
     String tempPin;
     Storage &storage;
     String readedPin;
-    MyClock &clock;
+    MyClock &RTclock;
     unsigned long lastKeyPressTime = 0;
 
 public:
-    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &clock); // Оголошення конструктора з посиланням
+    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &RTclock); // Оголошення конструктора з посиланням
+
+    uint8_t lcdState = 0;
 
     void keyPadSetup();
     void keyPadLoop();
     bool isUnlockCodeCorrect();
     void clearPin();
+    void lcdStateMachine(uint8_t &state);
     Keypad customKeypad;
-    bool backlight = true;
     bool isKeyPressed;
 };
 
