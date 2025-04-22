@@ -47,7 +47,8 @@ void KeyPadControl::keyPadLoop()
     esp_restart();
   }
   if (key == BTN_BACKLIGHT)
-  {
+  { 
+    clearPin();
     static bool backlightOn = true;
     backlightOn = !backlightOn;
     if (backlightOn)
@@ -67,6 +68,7 @@ void KeyPadControl::keyPadLoop()
     if (RTclock.isClockShow)
     {
       RTclock.isClockShow = false;
+      RTclock.firstUpdate = true;
       clearPin();
       lcdStateMachine(lcdState);
     }
@@ -90,7 +92,6 @@ void KeyPadControl::keyPadLoop()
     lcdStateMachine(lcdState);
     Serial.println("Change password mode activated");
     clearPin();
-    lcdStateMachine(lcdState);
     return;
   }
 
@@ -103,7 +104,6 @@ void KeyPadControl::keyPadLoop()
         lcdState = 3;
         lcdStateMachine(lcdState);
         clearPin();
-        lcdStateMachine(lcdState);
         changePasswordStage = 1;
       }
       else if (changePasswordStage == 1 && pinIndex == PASSWORD_LENGTH)
@@ -116,7 +116,6 @@ void KeyPadControl::keyPadLoop()
         lcdState = 2;
         lcdStateMachine(lcdState);
         clearPin();
-        lcdStateMachine(lcdState);
         changePasswordStage = 2;
       }
       else if (changePasswordStage == 2 && pinIndex == PASSWORD_LENGTH)
@@ -138,7 +137,6 @@ void KeyPadControl::keyPadLoop()
           lcdState = 4;
           lcdStateMachine(lcdState);
           clearPin();
-          lcdStateMachine(lcdState);
           tempPin = "";
           confirmPin = "";
           changePasswordStage = 0;
@@ -149,7 +147,6 @@ void KeyPadControl::keyPadLoop()
           lcdStateMachine(lcdState);
           Serial.println("Password confirmation mismatch");
           clearPin();
-          lcdStateMachine(lcdState);
         }
         clearPin();
         lcdStateMachine(lcdState);

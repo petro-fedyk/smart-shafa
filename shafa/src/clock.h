@@ -15,6 +15,9 @@ private:
     const char *ntpServer1;
     const char *ntpServer2;
 
+    unsigned long lastUpdateTime = 0;
+    bool isClockActive = false; 
+
     void setFont();
     void drawDigit(int col, int digit);
     void displayTime(int hours, int minutes);
@@ -28,6 +31,7 @@ public:
 
     void updateClock();
     bool isClockShow = false;
+    bool firstUpdate = true;
 };
 
 #endif

@@ -17,16 +17,18 @@ byte buffer[8];
 
 void MyClock::showClock()
 {
-    Serial.println("Entering showClock()"); // Лог для перевірки виклику функції
+    Serial.println("Entering showClock()");
 
     if (!isClockShow)
     {
-        lcd->clear();                           // Очищаємо дисплей
-        isClockShow = true;                     // Установлюємо прапорець
-        Serial.println("Clock mode activated"); // Лог для підтвердження активації режиму годинника
+        lcd->clear();
+        isClockShow = true;
+        isClockActive = true;
+        lastUpdateTime = millis();
+        Serial.println("Clock mode activated");
     }
 
-    updateClock(); // Оновлюємо годинник
+    updateClock();
 }
 
 MyClock::MyClock(LiquidCrystal_I2C *lcd, long gmtOffset_sec, int daylightOffset_sec,
@@ -104,23 +106,29 @@ void MyClock::displayTime(int hours, int minutes)
 
 void MyClock::updateClock()
 {
-    //Serial.println("Updating clock..."); // Лог для початку оновлення годинника
-
-    struct tm timeinfo;
-    if (getLocalTime(&timeinfo))
+    if (isClockActive)
     {
-        int hours = timeinfo.tm_hour;
-        int minutes = timeinfo.tm_min;
+        if (firstUpdate || millis() - lastUpdateTime >= 60000)
+        {   
+            firstUpdate = false;
+            lastUpdateTime = millis();
 
-        //Serial.print("Current time: ");
-        //Serial.print(hours);
-        //Serial.print(":");
-        //Serial.println(minutes);
+            struct tm timeinfo;
+            if (getLocalTime(&timeinfo))
+            {
+                int hours = timeinfo.tm_hour;
+                int minutes = timeinfo.tm_min;
 
-        displayTime(hours, minutes); // Відображаємо час
-    }
-    else
-    {
-        Serial.println("No time available (yet)"); // Лог для випадку, якщо час не отримано
+                displayTime(hours, minutes);
+                Serial.print("Clock updated: ");
+                Serial.print(hours);
+                Serial.print(":");
+                Serial.println(minutes);
+            }
+            else
+            {
+                Serial.println("No time available (yet)");
+            }
+        }
     }
 }
