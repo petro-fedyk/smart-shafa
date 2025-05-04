@@ -24,30 +24,6 @@ const int daylightOffset_sec = 3600;
 MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, NTP_SERVER1, NTP_SERVER2);
 KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
 
-bool wasTried = false;
-
-void checkTryUnlock()
-{
-  if (keyPadControl.tryToUnlock && !wasTried)
-  {
-    wasTried = false;
-    keyPadControl.tryToUnlock = false;
-
-    String buffer = myClock.getFormattedDateTime();
-    String methdot = checkMethod(keyPadControl);
-    bool isSuccess;
-
-    Serial.print("isKeyUnlock: ");
-    Serial.println(keyPadControl.isKeyUnlock);
-    Serial.print("isSuccess: ");
-    Serial.println(isSuccess);
-
-    String json = convertToJson(buffer, methdot, isSuccess);
-
-    printJson(json);
-  }
-}
-
 void setup()
 {
   Serial.begin(115200);
