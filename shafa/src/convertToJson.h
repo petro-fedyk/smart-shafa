@@ -11,7 +11,6 @@ extern MyClock myClock;
 
 bool wasTried = false;
 
-// Оголошення функцій
 String checkMethod(KeyPadControl &control);
 void printJson(const String &json);
 String createJsonString(const String &buffer, const String &methdot, bool isSuccess);
@@ -25,7 +24,7 @@ void checkTryUnlock()
 
         String buffer = myClock.getFormattedDateTime();
         String methdot = checkMethod(keyPadControl);
-        bool isSuccess = keyPadControl.isKeyUnlock; // Приклад: отримуємо статус успіху
+        bool isSuccess = keyPadControl.isKeyUnlock;
 
         Serial.print("isKeyUnlock: ");
         Serial.println(keyPadControl.isKeyUnlock);
