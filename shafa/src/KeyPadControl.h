@@ -23,6 +23,7 @@ private:
     String readedPin;
     MyClock &RTclock;
     unsigned long lastKeyPressTime = 0;
+    String enterPin();
 
 public:
     KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &RTclock); // Оголошення конструктора з посиланням
@@ -36,6 +37,9 @@ public:
     void lcdStateMachine(uint8_t &state);
     Keypad customKeypad;
     bool isKeyPressed;
+    bool isKeyUnlock = false;
+    bool isSuccess = false; // move to global variable
+    bool tryToUnlock = false;
 };
 
 #endif

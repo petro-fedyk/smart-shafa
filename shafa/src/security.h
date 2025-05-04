@@ -1,10 +1,10 @@
 #ifndef SECURITY_H
 #define SECURITY_H
 
-//#define WIFI_SSID "611VVA"
-#define WIFI_SSID "__MY__VAULT__"
-//#define PASSWORD "123qwerty9"
-#define PASSWORD "79715218"
+// #define WIFI_SSID "611VVA"
+#define WIFI_SSID "admin"
+// #define PASSWORD "123qwerty9"
+#define PASSWORD "domestos1216"
 #define NTP_SERVER1 "pool.ntp.org"
 #define NTP_SERVER2 "time.nist.gov"
 #define GTMOFFSET_SEC 72000

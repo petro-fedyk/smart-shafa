@@ -109,7 +109,7 @@ void MyClock::updateClock()
     if (isClockActive)
     {
         if (firstUpdate || millis() - lastUpdateTime >= 60000)
-        {   
+        {
             firstUpdate = false;
             lastUpdateTime = millis();
 
@@ -130,5 +130,25 @@ void MyClock::updateClock()
                 Serial.println("No time available (yet)");
             }
         }
+    }
+}
+
+String MyClock::getFormattedDateTime()
+{
+    struct tm timeinfo;
+    if (getLocalTime(&timeinfo))
+    {
+        char buffer[20];
+        snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d.%02d:%02d",
+                 timeinfo.tm_year + 1900, // Рік
+                 timeinfo.tm_mon + 1,     // Місяць (0-11, тому додаємо 1)
+                 timeinfo.tm_mday,        // День місяця
+                 timeinfo.tm_hour,        // Години
+                 timeinfo.tm_min);        // Хвилини
+        return String(buffer);
+    }
+    else
+    {
+        return "No time available";
     }
 }

@@ -11,7 +11,7 @@
 #include "wifiConnect.h"
 #include "clock.h"
 #include "ota.h"
-
+#include "convertToJson.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -21,8 +21,32 @@ Transistor transistor(TRANSISTOR_PIN);
 const long gmtOffset_sec = 7200;
 const int daylightOffset_sec = 3600;
 
-MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, NTP_SERVER1, NTP_SERVER2); // Передаємо значення// Тепер змінні доступні
+MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, NTP_SERVER1, NTP_SERVER2);
 KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
+
+bool wasTried = false;
+
+void checkTryUnlock()
+{
+  if (keyPadControl.tryToUnlock && !wasTried)
+  {
+    wasTried = false;
+    keyPadControl.tryToUnlock = false;
+
+    String buffer = myClock.getFormattedDateTime();
+    String methdot = checkMethod(keyPadControl);
+    bool isSuccess;
+
+    Serial.print("isKeyUnlock: ");
+    Serial.println(keyPadControl.isKeyUnlock);
+    Serial.print("isSuccess: ");
+    Serial.println(isSuccess);
+
+    String json = convertToJson(buffer, methdot, isSuccess);
+
+    printJson(json);
+  }
+}
 
 void setup()
 {
@@ -33,7 +57,7 @@ void setup()
   connectToWiFi(WIFI_SSID, PASSWORD);
   setupOTA("my_esp32", OTA_PIN);
 
-  //screenInit();
+  // screenInit();
 
   myClock.initClock();
 
@@ -52,4 +76,8 @@ void loop()
     myClock.updateClock();
   }
   handleOTA();
+  checkTryUnlock();
+
+  // String dataTime = myClock.getFormattedDateTime();
+  // Serial.println(dataTime);
 }

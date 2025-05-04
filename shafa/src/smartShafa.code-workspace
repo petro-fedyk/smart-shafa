@@ -11,6 +11,10 @@
 		{
 			"name": "clock",
 			"path": "../../../clock"
+		},
+		{
+			"name": "TemparatureMonitor",
+			"path": "../../../temparetureMonitor/TemparatureMonitor"
 		}
 	],
 	"settings": {

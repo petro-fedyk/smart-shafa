@@ -16,7 +16,7 @@ private:
     const char *ntpServer2;
 
     unsigned long lastUpdateTime = 0;
-    bool isClockActive = false; 
+    bool isClockActive = false;
 
     void setFont();
     void drawDigit(int col, int digit);
@@ -28,6 +28,7 @@ public:
 
     void showClock();
     void initClock();
+    String getFormattedDateTime();
 
     void updateClock();
     bool isClockShow = false;

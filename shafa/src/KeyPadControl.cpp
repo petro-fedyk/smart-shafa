@@ -47,7 +47,7 @@ void KeyPadControl::keyPadLoop()
     esp_restart();
   }
   if (key == BTN_BACKLIGHT)
-  { 
+  {
     clearPin();
     static bool backlightOn = true;
     backlightOn = !backlightOn;
@@ -80,7 +80,7 @@ void KeyPadControl::keyPadLoop()
     {
       Serial.println("No activity detected. Switching to clock mode...");
       lcdState = 8;
-      lcdStateMachine(lcdState);      
+      lcdStateMachine(lcdState);
     }
     return;
   }
@@ -162,15 +162,15 @@ void KeyPadControl::keyPadLoop()
       }
     }
     else if (key == BTN_RESET)
-    { 
+    {
       changePasswordMode = false;
       changePasswordStage = 0;
       clearPin();
       lcdStateMachine(lcdState);
-
     }
     else if (key != NO_KEY)
     {
+      // String pinDisplay = enterPin();
       if (pinIndex < PASSWORD_LENGTH)
       {
         enteredPin[pinIndex++] = key;
@@ -190,16 +190,19 @@ void KeyPadControl::keyPadLoop()
 
   if (key == BTN_CONFIRM)
   {
+    tryToUnlock = true;
+    Serial.println("try to unlock");
     if (isUnlockCodeCorrect())
     {
       lcdState = 7;
       lcdStateMachine(lcdState);
       transistor.unlock();
       Serial.println("Access Granted");
-
       clearPin();
       lcdStateMachine(lcdState);
 
+      isKeyUnlock = true;
+      isSuccess = true;
     }
     else
     {
@@ -209,6 +212,8 @@ void KeyPadControl::keyPadLoop()
       clearPin();
       lcdStateMachine(lcdState);
 
+      isKeyUnlock = true;
+      isSuccess = false;
     }
     clearPin();
     lcdStateMachine(lcdState);
@@ -220,6 +225,8 @@ void KeyPadControl::keyPadLoop()
   }
   else if (key != NO_KEY)
   {
+    // String pinDisplay = enterPin();
+
     if (pinIndex < PASSWORD_LENGTH)
     {
       enteredPin[pinIndex++] = key;
@@ -234,6 +241,7 @@ void KeyPadControl::keyPadLoop()
       lcd.print(pinDisplay);
     }
   }
+  // tryToUnlock = false;
 }
 
 bool KeyPadControl::isUnlockCodeCorrect()
@@ -277,58 +285,79 @@ void KeyPadControl::clearPin()
   pinIndex = 0;
   lcd.setCursor(0, 0);
   lcdState = 0;
+  // isKeyUnlock = false;
+  // isSuccess = false;
+  // tryToUnlock = false;
 }
+
+// String KeyPadControl::enterPin()
+// {
+//   char key = customKeypad.getKey();
+//   isKeyPressed = (key != NO_KEY);
+
+//   if (pinIndex < PASSWORD_LENGTH)
+//   {
+//     enteredPin[pinIndex++] = key;
+
+//     String pinBuffer = "";
+//     for (uint8_t i = 0; i < pinIndex; i++)
+//     {
+//       pinBuffer += char(enteredPin[i]);
+//     }
+//     return pinBuffer;
+//   }
+// }
 
 void KeyPadControl::lcdStateMachine(uint8_t &state)
 {
-    switch (state)
-    {
-    case 0:
-        lcd.clear();
-        lcd.print("Enter Code:");
-        Serial.println("Enter Code:");
-        break;
-    case 1:
-        lcd.clear();
-        lcd.print("Enter Old Pass:");
-        Serial.println("Enter Old Pass:");
-        break;
-    case 2:                    
-        lcd.clear();
-        lcd.print("Confirm New Pass:");
-        Serial.println("Confirm New Pass:");
-        break;
-    case 3:
-        lcd.clear();
-        lcd.print("Enter New Pass:");
-        Serial.println("Enter New Pass:");
-        break;
-    case 4:
-        lcd.clear();
-        lcd.print("Pass Changed");
-        Serial.println("Pass Changed");
-        break;
-    case 5:
-        lcd.clear();
-        lcd.print("Mismatch");
-        Serial.println("Mismatch");
-        break;
-    case 6:
-        lcd.clear();
-        lcd.print("Wrong Pass");
-        Serial.println("Wrong Pass");
-    case 7:
-        lcd.clear();
-        lcd.print("Access Granted");
-        Serial.println("Access Granted");
-        break;
-    case 8:
-        lcd.clear();
-        RTclock.showClock();
-        Serial.println("Clock is mode activated");
-        break;
-    default:
-        Serial.println("Unhandled state");
-        break;
-    }   
+  switch (state)
+  {
+  case 0:
+    lcd.clear();
+    lcd.print("Enter Code:");
+    Serial.println("Enter Code:");
+    break;
+  case 1:
+    lcd.clear();
+    lcd.print("Enter Old Pass:");
+    Serial.println("Enter Old Pass:");
+    break;
+  case 2:
+    lcd.clear();
+    lcd.print("Confirm New Pass:");
+    Serial.println("Confirm New Pass:");
+    break;
+  case 3:
+    lcd.clear();
+    lcd.print("Enter New Pass:");
+    Serial.println("Enter New Pass:");
+    break;
+  case 4:
+    lcd.clear();
+    lcd.print("Pass Changed");
+    Serial.println("Pass Changed");
+    break;
+  case 5:
+    lcd.clear();
+    lcd.print("Mismatch");
+    Serial.println("Mismatch");
+    break;
+  case 6:
+    lcd.clear();
+    lcd.print("Wrong Pass");
+    Serial.println("Wrong Pass");
+  case 7:
+    lcd.clear();
+    lcd.print("Access Granted");
+    Serial.println("Access Granted");
+    break;
+  case 8:
+    lcd.clear();
+    RTclock.showClock();
+    Serial.println("Clock is mode activated");
+    break;
+  default:
+    Serial.println("Unhandled state");
+    break;
+  }
 }
