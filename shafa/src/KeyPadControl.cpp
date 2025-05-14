@@ -290,24 +290,6 @@ void KeyPadControl::clearPin()
   // tryToUnlock = false;
 }
 
-// String KeyPadControl::enterPin()
-// {
-//   char key = customKeypad.getKey();
-//   isKeyPressed = (key != NO_KEY);
-
-//   if (pinIndex < PASSWORD_LENGTH)
-//   {
-//     enteredPin[pinIndex++] = key;
-
-//     String pinBuffer = "";
-//     for (uint8_t i = 0; i < pinIndex; i++)
-//     {
-//       pinBuffer += char(enteredPin[i]);
-//     }
-//     return pinBuffer;
-//   }
-// }
-
 void KeyPadControl::lcdStateMachine(uint8_t &state)
 {
   switch (state)

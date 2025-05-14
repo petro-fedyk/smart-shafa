@@ -12,6 +12,7 @@
 #include "clock.h"
 #include "ota.h"
 #include "convertToJson.h"
+#include "sendToApi.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 

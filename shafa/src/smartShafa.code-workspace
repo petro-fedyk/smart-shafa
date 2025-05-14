@@ -24,6 +24,7 @@
 			"type_traits": "cpp",
 			"compare": "cpp",
 			"mutex": "cpp"
-		}
+		},
+		"liveServer.settings.multiRootWorkspaceName": "smartShafa"
 	}
 }

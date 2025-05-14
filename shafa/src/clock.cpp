@@ -140,11 +140,11 @@ String MyClock::getFormattedDateTime()
     {
         char buffer[20];
         snprintf(buffer, sizeof(buffer), "%04d.%02d.%02d.%02d:%02d",
-                 timeinfo.tm_year + 1900, // Рік
-                 timeinfo.tm_mon + 1,     // Місяць (0-11, тому додаємо 1)
-                 timeinfo.tm_mday,        // День місяця
-                 timeinfo.tm_hour,        // Години
-                 timeinfo.tm_min);        // Хвилини
+                 timeinfo.tm_year + 1900,
+                 timeinfo.tm_mon + 1,
+                 timeinfo.tm_mday,
+                 timeinfo.tm_hour,
+                 timeinfo.tm_min);
         return String(buffer);
     }
     else
