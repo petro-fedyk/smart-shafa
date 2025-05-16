@@ -2,6 +2,7 @@
 #define PIN_N
 
 #define TRANSISTOR_PIN 2
+#define BUZZER_PIN 16
 #define DISPLAY_ADDRESS 0x27
 #define KEYPAD_ROWS 4
 #define KEYPAD_COLS 4

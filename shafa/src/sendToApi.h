@@ -4,7 +4,7 @@
 #include <HTTPClient.h>
 #include "convertToJson.h"
 
-const char *serverName = "http://192.168.1.45:5000//api/shafa_data/";
+const char *serverName = "http://192.168.0.129:5000//api/shafa_data/";
 
 void sendToSrver(const String &buffer, const String &methdot, bool isSuccess)
 {

@@ -13,17 +13,20 @@
 #include "ota.h"
 #include "convertToJson.h"
 #include "sendToApi.h"
+#include "buzzer.h"
+// #include "mqtt.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 Storage storage;
 Transistor transistor(TRANSISTOR_PIN);
+myBuzzer buzzer(BUZZER_PIN);
 
 const long gmtOffset_sec = 7200;
 const int daylightOffset_sec = 3600;
 
 MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, NTP_SERVER1, NTP_SERVER2);
-KeyPadControl keyPadControl(lcd, storage, transistor, myClock);
+KeyPadControl keyPadControl(lcd, storage, transistor, myClock, buzzer);
 
 void setup()
 {
@@ -41,7 +44,9 @@ void setup()
   storage.StorageSetup();
 
   keyPadControl.keyPadSetup();
+  // mqttSetUp();
   Serial.println("Setup complete");
+  buzzer.greatingSound();
 }
 
 void loop()
@@ -54,6 +59,12 @@ void loop()
   }
   handleOTA();
   checkTryUnlock();
+
+  // if (!client.connected())
+  // {
+  //   mqttSetUp(); // повторне підключення, якщо втрачено
+  // }
+  // client.loop();
 
   // String dataTime = myClock.getFormattedDateTime();
   // Serial.println(dataTime);

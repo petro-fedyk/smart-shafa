@@ -14,12 +14,13 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
-KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &RTclock)
+KeyPadControl::KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &RTclock, myBuzzer &buzzer)
     : customKeypad(makeKeymap(hexaKeys), rowPins, colPins, KEYPAD_ROWS, KEYPAD_COLS),
       lcd(lcd),
       storage(storage),
       transistor(transistor),
       RTclock(RTclock),
+      buzzer(buzzer),
       pinIndex(0),
       changePasswordMode(false),
       changePasswordStage(0)
@@ -201,6 +202,7 @@ void KeyPadControl::keyPadLoop()
       clearPin();
       lcdStateMachine(lcdState);
 
+      buzzer.successSound();
       isKeyUnlock = true;
       isSuccess = true;
     }
@@ -212,6 +214,7 @@ void KeyPadControl::keyPadLoop()
       clearPin();
       lcdStateMachine(lcdState);
 
+      buzzer.unsuccessSound();
       isKeyUnlock = true;
       isSuccess = false;
     }

@@ -8,6 +8,7 @@
 #include "pin.h"
 #include "storage.h"
 #include "clock.h"
+#include "buzzer.h"
 
 class KeyPadControl
 {
@@ -24,9 +25,10 @@ private:
     MyClock &RTclock;
     unsigned long lastKeyPressTime = 0;
     String enterPin();
+    myBuzzer &buzzer;
 
 public:
-    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &RTclock); // Оголошення конструктора з посиланням
+    KeyPadControl(LiquidCrystal_I2C &lcd, Storage &storage, Transistor &transistor, MyClock &RTclock, myBuzzer &buzzer); // Оголошення конструктора з посиланням
 
     uint8_t lcdState = 0;
 
