@@ -14,6 +14,7 @@
 #include "convertToJson.h"
 #include "sendToApi.h"
 #include "buzzer.h"
+#include "alarm.h"
 // #include "mqtt.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -27,6 +28,26 @@ const int daylightOffset_sec = 3600;
 
 MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, NTP_SERVER1, NTP_SERVER2);
 KeyPadControl keyPadControl(lcd, storage, transistor, myClock, buzzer);
+
+#define ALARM_UPDATE 10000
+unsigned long curAlarmTime = 0;
+bool previousAlarm = false;
+
+void turnAlarm()
+{
+  if (millis() - curAlarmTime >= ALARM_UPDATE)
+  {
+
+    if (isAlarm && !previousAlarm)
+    {
+      buzzer.alarmSound();
+      transistor.unlock();
+      Serial.println("Alarm state changed");
+    }
+    previousAlarm = isAlarm;
+    curAlarmTime = millis();
+  }
+}
 
 void setup()
 {
@@ -59,6 +80,8 @@ void loop()
   }
   handleOTA();
   checkTryUnlock();
+  checkAlarm();
+  turnAlarm();
 
   // if (!client.connected())
   // {

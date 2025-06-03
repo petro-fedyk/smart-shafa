@@ -20,11 +20,16 @@ private:
     unsigned long frequencyUnSUC = 300;
     unsigned long timeUnSUC = 400;
 
+    uint8_t alarmTone = 2;
+    unsigned long frequencyAlarm = 300;
+    unsigned long timeAlarm = 12000;
+
 public:
     myBuzzer(uint8_t pin);
     void greatingSound();
     void successSound();
     void unsuccessSound();
+    void alarmSound();
 };
 
 #endif

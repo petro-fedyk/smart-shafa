@@ -13,6 +13,7 @@ void myBuzzer::greatingSound()
     {
         tone(buzzPin, frequencyGR, timeGR);
     }
+    Serial.println("buzzer greating");
 }
 
 void myBuzzer::successSound()
@@ -29,4 +30,13 @@ void myBuzzer::unsuccessSound()
     {
         tone(buzzPin, frequencyUnSUC, timeUnSUC);
     }
+}
+
+void myBuzzer::alarmSound()
+{
+    for (int i = 0; i < alarmTone; i++)
+    {
+        tone(buzzPin, frequencyAlarm, timeAlarm);
+    }
+    Serial.println("alarm sound");
 }
