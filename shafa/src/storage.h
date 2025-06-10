@@ -9,7 +9,8 @@ class Storage
 private:
     const String pinPath = "/pin.txt";
     const String modePath = "/mode.txt";
-    const String credentialsPath = "/wifi.json";
+    const String credentialsPath = "/wifi.csv";
+
 
 
     // String ssid;
@@ -24,7 +25,7 @@ public:
     String readedpassword;
     void writePin(String &confirmPin);
     void readCredentials();
-    void writeCredentials(const String &ssid, const String &password);
+    void writeCredentials(String &ssid, String &password);
     String readedMode;
     String readMode();
     void writeMode(const String &mode);

@@ -68,9 +68,51 @@
       .head {
         margin-top: 20px;
       }
+
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        display: none;
+        text-align: center;
+      }
+
+      .status.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .status.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .connection-status {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: #333;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+      }
+
+      .connection-status.connected {
+        background-color: #4CAF50;
+      }
+
+      .connection-status.disconnected {
+        background-color: #ff6b6b;
+      }
     </style>
   </head>
   <body>
+    <div id="connectionStatus" class="connection-status">Connecting...</div>
+    <div id="status" class="status"></div>
+
     <div class="navbar">
       <a href="javascript:void(0)" onclick="showTab('wifi')">WiFi Mode</a>
       <a href="javascript:void(0)" onclick="showTab('lock')">Open Lock</a>
@@ -80,9 +122,9 @@
       <form action="" method="" class="change-cred">
         <h1>WIFI MODE</h1>
         <div class="wifi-mode">
-          <input type="radio" id="AP" name="fav_language" value="AP" />
+          <input type="radio" id="AP" name="fav_language" value="0" />
           <label for="AP">Access Point</label><br />
-          <input type="radio" id="ST" name="fav_language" value="ST" />
+          <input type="radio" id="ST" name="fav_language" value="1" />
           <label for="ST">Stationary</label><br />
         </div>
         <h1 class="head">WIFI/AP SETTINGS</h1>
@@ -91,7 +133,7 @@
           <input type="text" id="ssid" name="ssid" /><br /><br />
           <label for="password">PASSWORD:</label>
           <input type="text" id="password" name="password" /><br /><br />
-          <input class="subm" type="submit" value="Save Settings" />
+          <input id="wifi-btn" class="subm" type="button" value="Save Settings" />
         </div>
       </form>
     </section>
@@ -101,13 +143,188 @@
         <h1>Open Lock</h1>
         <div>
           <label for="pin">PIN:</label>
-          <input type="text" id="pin" name="pin" /><br /><br />
-          <input class="subm" type="submit" value="Open" />
+          <input type="number" id="pin" name="pin"
+          oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+          maxlength="4" /><br /><br />
+          <input id="lock-btn" class="subm" type="button" value="Open" />
         </div>
       </form>
     </section>
 
     <script>
+      class SmartShafaController {
+        constructor() {
+          this.ws = null;
+          this.reconnectInterval = 5000;
+          this.maxReconnectAttempts = 10;
+          this.reconnectAttempts = 0;
+          this.connect();
+          this.setupEventListeners();
+        }
+
+        connect() {
+          const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+          const wsUrl = `${protocol}//${window.location.host}/ws`;
+          
+          this.ws = new WebSocket(wsUrl);
+          
+          this.ws.onopen = () => {
+            console.log('WebSocket connected');
+            this.updateConnectionStatus('Connected', true);
+            this.reconnectAttempts = 0;
+          };
+          
+          this.ws.onmessage = (event) => {
+            this.handleMessage(JSON.parse(event.data));
+          };
+          
+          this.ws.onclose = () => {
+            console.log('WebSocket disconnected');
+            this.updateConnectionStatus('Disconnected', false);
+            this.attemptReconnect();
+          };
+          
+          this.ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            this.updateConnectionStatus('Error', false);
+          };
+        }
+
+        attemptReconnect() {
+          if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            this.updateConnectionStatus(`Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`, false);
+            setTimeout(() => this.connect(), this.reconnectInterval);
+          }
+        }
+
+        sendMessage(command, data = {}) {
+          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            const message = {
+              command: command,
+              timestamp: Date.now(),
+              ...data
+            };
+            this.ws.send(JSON.stringify(message));
+          } else {
+            this.showStatus('WebSocket not connected', 'error');
+          }
+        }
+
+        handleMessage(data) {
+          console.log('Received:', data);
+          
+          if (data.type === 'currentData') {
+            this.updateCurrentData(data.data);
+          } else if (data.command) {
+            this.showStatus(data.message || 'Command executed', data.status === 'success' ? 'success' : 'error');
+            
+            // Handle specific responses
+            if (data.command === 'unlockDevice' && data.unlocked) {
+              document.getElementById('pin').value = '';
+            }
+            
+            if (data.command === 'saveWiFiSettings' && data.restart) {
+              this.showRestartCountdown();
+            }
+          }
+        }
+
+        updateCurrentData(data) {
+          // Update form values with current data
+          document.getElementById('ssid').value = data.ssid || '';
+          document.getElementById('password').value = data.password || '';
+          
+          // Set radio buttons based on mode (0=AP, 1=STA)
+          if (data.mode === 0) {
+            document.getElementById('AP').checked = true;
+          } else {
+            document.getElementById('ST').checked = true;
+          }
+          
+          console.log('Current WiFi Mode:', data.mode === 0 ? 'Access Point' : 'Station');
+          console.log('Current SSID:', data.ssid);
+        }
+
+        updateConnectionStatus(status, isConnected) {
+          const statusElement = document.getElementById('connectionStatus');
+          statusElement.textContent = status;
+          statusElement.className = `connection-status ${isConnected ? 'connected' : 'disconnected'}`;
+        }
+
+        showStatus(message, type) {
+          const statusDiv = document.getElementById('status');
+          statusDiv.textContent = message;
+          statusDiv.className = `status ${type}`;
+          statusDiv.style.display = 'block';
+          
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 5000);
+        }
+
+        showRestartCountdown() {
+          let countdown = 3;
+          const interval = setInterval(() => {
+            this.showStatus(`ESP32 restarting in ${countdown}...`, 'success');
+            countdown--;
+            if (countdown < 0) {
+              clearInterval(interval);
+              this.showStatus('ESP32 is restarting...', 'success');
+            }
+          }, 1000);
+        }
+
+        validatePIN(pin) {
+          return pin.length === 4 && /^\d+$/.test(pin);
+        }
+
+        setupEventListeners() {
+          // Save WiFi Settings
+          document.getElementById('wifi-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const ssid = document.getElementById('ssid').value.trim();
+            const password = document.getElementById('password').value;
+            const modeRadio = document.querySelector('input[name="fav_language"]:checked');
+            
+            if (!ssid) {
+              this.showStatus('SSID cannot be empty', 'error');
+              return;
+            }
+            
+            if (!modeRadio) {
+              this.showStatus('Please select WiFi mode', 'error');
+              return;
+            }
+            
+            const mode = modeRadio.value; // "0" for AP, "1" for STA
+            
+            this.sendMessage('saveWiFiSettings', {
+              ssid: ssid,
+              password: password,
+              mode: mode
+            });
+          });
+
+          // Unlock Device
+          document.getElementById('lock-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            const pin = document.getElementById('pin').value;
+            
+            if (!this.validatePIN(pin)) {
+              this.showStatus('PIN must be exactly 4 digits', 'error');
+              return;
+            }
+            
+            this.sendMessage('unlockDevice', {
+              pin: pin
+            });
+          });
+        }
+      }
+
       function showTab(tabName) {
         const tabs = document.querySelectorAll(".tab-content");
         tabs.forEach((tab) => tab.classList.remove("active"));
@@ -116,7 +333,11 @@
         activeTab.classList.add("active");
       }
 
-      showTab("wifi");
+      // Initialize controller when page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        new SmartShafaController();
+        showTab("wifi");
+      });
     </script>
   </body>
 </html>

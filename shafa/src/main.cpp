@@ -14,6 +14,7 @@
 #include "convertToJson.h"
 #include "sendToApi.h"
 #include "buzzer.h"
+#include "webserver.h"
 // #include "mqtt.h"
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -34,16 +35,32 @@ void setup()
 {
   Serial.begin(115200);
   Wire.begin();
-  Serial.println(WIFI_SSID);
-  Serial.println(PASSWORD);
-  connectToWiFi(WIFI_SSID, PASSWORD, &wifi_mode);
+  storage.StorageSetup();
+
+  String modeStr = storage.readMode();
+  if (modeStr == "0") {
+    wifi_mode = WIFI_MODE_AP;
+  } else {
+    wifi_mode = WIFI_MODE_STA;
+  }
+
+  storage.readCredentials();
+  String ssid = storage.readedssid;
+  String password = storage.readedpassword;
+  
+  Serial.println("Using stored WiFi settings:");
+  Serial.println("SSID: " + ssid);
+  Serial.println("Password: " + password);
+  Serial.println("Mode: " + String(wifi_mode == WIFI_MODE_AP ? "AP" : "STA"));
+  
+  connectToWiFi(const_cast<char*>(ssid.c_str()), const_cast<char*>(password.c_str()), &wifi_mode);
   setupOTA("my_esp32", OTA_PIN);
 
   myClock.initClock();
-
-  storage.StorageSetup();
-
   keyPadControl.keyPadSetup();
+
+  initWebServer(&storage, &transistor);
+
   // mqttSetUp();
   Serial.println("Setup complete");
   buzzer.greatingSound();
@@ -60,6 +77,7 @@ void loop()
   handleOTA();
   checkTryUnlock();
 
+  handleWebServerClients();
   // if (!client.connected())
   // {
   //   mqttSetUp(); // повторне підключення, якщо втрачено

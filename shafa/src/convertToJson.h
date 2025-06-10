@@ -24,8 +24,8 @@ void checkTryUnlock()
     {
         wasTried = false;
         keyPadControl.tryToUnlock = false;
-        keyPadControl.isSuccess = false;
-        keyPadControl.isKeyUnlock = false;
+        keyPadControl.isSuccess;
+        keyPadControl.isKeyUnlock;
 
         String buffer = myClock.getFormattedDateTime();
         String methdot = checkMethod(keyPadControl);
@@ -38,7 +38,11 @@ void checkTryUnlock()
 
         String json = createJsonString(buffer, methdot, isSuccess);
         sendToSrver(buffer, methdot, isSuccess);
+        
         // sentData();
+        
+        keyPadControl.isSuccess = false;
+        keyPadControl.isKeyUnlock = false;
 
         printJson(json);
     }

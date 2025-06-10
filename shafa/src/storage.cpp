@@ -134,6 +134,20 @@ void Storage::readCredentials()
 
 }
 
+void Storage::writeCredentials(String &ssid, String &password)
+{
+    File file = LittleFS.open(credentialsPath, "w");
+    if (!file)
+    {
+        Serial.println("Failed to open credentials file for writing");
+        return;
+    }
+
+    file.println(ssid + "," + password);
+    file.close();
+    Serial.println("Credentials written to file");
+}
+
 String Storage::readMode()
 {
     File file = LittleFS.open(modePath, "r");
@@ -146,7 +160,7 @@ String Storage::readMode()
             file.println("0");
             file.close();
             Serial.println("File created");
-            readedMode = "0"; // Default mode
+            readedMode = "0";
             return readedMode;
         }
         else
