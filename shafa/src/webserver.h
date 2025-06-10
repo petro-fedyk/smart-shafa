@@ -15,6 +15,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 Storage* webStorage = nullptr;
 Transistor* webTransistor = nullptr;
+extern KeyPadControl keyPadControl;
 
 void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, 
                      AwsEventType type, void *arg, uint8_t *data, size_t len) {
@@ -106,6 +107,8 @@ void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                         String storedPIN = webStorage->readPin();
                         if (enteredPIN == storedPIN) {
                             webTransistor->unlock();
+                            keyPadControl.isKeyUnlock = true;
+                            keyPadControl.isKeyUnlock = true;
                             
                             response["status"] = "success";
                             response["message"] = "Device unlocked successfully";

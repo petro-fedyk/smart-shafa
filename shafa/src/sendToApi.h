@@ -4,7 +4,10 @@
 #include <HTTPClient.h>
 #include "convertToJson.h"
 
-const char *serverName = "http://192.168.0.129:5000//api/shafa_data/";
+// Declare the function prototype for createJsonString
+String createJsonString(const String &buffer, const String &methdot, bool isSuccess);
+
+const char *serverName = "http://192.168.31.113:5000//api/shafa_data/";
 
 void sendToSrver(const String &buffer, const String &methdot, bool isSuccess)
 {

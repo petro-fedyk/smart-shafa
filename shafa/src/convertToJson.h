@@ -5,7 +5,7 @@
 #include <ArduinoJson.h>
 #include "KeyPadControl.h"
 #include "clock.h"
-// #include "sendToApi.h"
+#include "sendToApi.h"
 
 extern KeyPadControl keyPadControl;
 extern MyClock myClock;
@@ -16,7 +16,7 @@ String checkMethod(KeyPadControl &control);
 void printJson(const String &json);
 String createJsonString(const String &buffer, const String &methdot, bool isSuccess);
 void sendToSrver(const String &buffer, const String &methdot, bool isSuccess);
-// void sentData();
+void sentData();
 
 void checkTryUnlock()
 {
@@ -39,7 +39,7 @@ void checkTryUnlock()
         String json = createJsonString(buffer, methdot, isSuccess);
         sendToSrver(buffer, methdot, isSuccess);
         
-        // sentData();
+        sentData();
         
         keyPadControl.isSuccess = false;
         keyPadControl.isKeyUnlock = false;

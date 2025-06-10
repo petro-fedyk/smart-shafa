@@ -2,195 +2,245 @@
 
 void Storage::StorageSetup()
 {
-    if (!LittleFS.begin(true, "/littlefs", 10U, "littlefs"))
-    {
-        Serial.println("An Error has occurred while mounting LittleFS");
+    Serial.println("Initializing LittleFS...");
+    
+    // Try multiple mount attempts with different configurations
+    bool mounted = false;
+    
+    // First try: Normal mount
+    if (LittleFS.begin()) {
+        mounted = true;
+        Serial.println("LittleFS mounted successfully (normal)");
+    }
+    // Second try: Mount with format on fail
+    else if (LittleFS.begin(true)) {
+        mounted = true;
+        Serial.println("LittleFS mounted successfully (with format)");
+    }
+    // Third try: Explicit format then mount
+    else {
+        Serial.println("Formatting LittleFS...");
+        if (LittleFS.format()) {
+            if (LittleFS.begin()) {
+                mounted = true;
+                Serial.println("LittleFS mounted successfully (after format)");
+            }
+        }
+    }
+    
+    if (!mounted) {
+        Serial.println("LittleFS Mount Failed completely! Using defaults.");
+        // Set default values in memory
+        readedPin = "1234";
+        readedssid = "ESPSETUP";
+        readedpassword = "ESPSETUP";
+        readedMode = "0";
         return;
     }
-    File root = LittleFS.open("/");
-    if (!root || !root.isDirectory())
-    {
-        Serial.println("Failed to open directory");
-        return;
+    
+    // LittleFS is working, check and create files
+    Serial.println("LittleFS mounted successfully");
+    
+    // Check total and used space
+    Serial.printf("LittleFS Total: %d bytes, Used: %d bytes\n", 
+                  LittleFS.totalBytes(), LittleFS.usedBytes());
+    
+    // Check if files exist, create them if they don't
+    if (!LittleFS.exists("/pin.txt")) {
+        String defaultPin = "1234";
+        writePin(defaultPin);
+        Serial.println("Created default PIN file");
     }
+    
+    if (!LittleFS.exists("/wifi.csv")) {
+        String defaultSSID = "ESPSETUP";
+        String defaultPassword = "ESPSETUP";
+        writeCredentials(defaultSSID, defaultPassword);
+        Serial.println("Created default WiFi credentials file");
+    }
+    
+    if (!LittleFS.exists("/mode.txt")) {
+        writeMode("0"); // Default to AP mode
+        Serial.println("Created default mode file");
+    }
+    
+    // List all files for debugging
+    listFiles();
+}
 
-    File file = root.openNextFile();
-    while (file)
-    {
-        Serial.print("FILE: ");
-        Serial.println(file.name());
-        file = root.openNextFile();
+void Storage::listFiles() {
+    Serial.println("Files in LittleFS:");
+    File root = LittleFS.open("/");
+    if (root) {
+        File file = root.openNextFile();
+        while (file) {
+            Serial.printf("  %s (%d bytes)\n", file.name(), file.size());
+            file = root.openNextFile();
+        }
+        root.close();
+    } else {
+        Serial.println("Failed to open root directory");
     }
-    readPin();
-    readCredentials();
-    readMode();
 }
 
 String Storage::readPin()
 {
-    File file = LittleFS.open(pinPath, "r");
-    if (!file)
-    {
-        Serial.println("File not found, creating new one...");
-        file = LittleFS.open(pinPath, "w");
-        if (file)
-        {
-            file.println("1234");
-            file.close();
-            Serial.println("File created");
-            readedPin = "1234";
-            return readedPin;
-        }
-        else
-        {
-            Serial.println("Failed to create file");
-            return "";
-        }
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS not available, using default PIN");
+        return "1234";
     }
-
-    if (!file)
-    {
-        Serial.println("Failed to open file for reading");
-        return "";
+    
+    if (!LittleFS.exists("/pin.txt")) {
+        Serial.println("PIN file doesn't exist, creating default");
+        String defaultPin = "1234";
+        writePin(defaultPin);
+        return defaultPin;
     }
-
-    readedPin = "";
-    while (file.available())
-    {
-        readedPin += (char)file.read();
+    
+    File file = LittleFS.open("/pin.txt", "r");
+    if (!file) {
+        Serial.println("Failed to open PIN file");
+        return "1234";
     }
+    
+    String pin = file.readString();
     file.close();
-
-    readedPin.trim();
-
-    Serial.println("File Content:");
-    Serial.println(readedPin);
-
-    return readedPin;
+    pin.trim();
+    
+    Serial.println("Read PIN: " + pin);
+    readedPin = pin;
+    return pin;
 }
 
 void Storage::writePin(String &newPin)
 {
-    File file = LittleFS.open(pinPath, "w");
-    if (!file)
-    {
-        Serial.println("Failed to open file for writing");
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS not available, cannot write PIN");
         return;
     }
-
-    file.println(newPin);
+    
+    File file = LittleFS.open("/pin.txt", "w");
+    if (!file) {
+        Serial.println("Failed to open PIN file for writing");
+        return;
+    }
+    
+    file.print(newPin);
     file.close();
-    Serial.println("New PIN written to file");
+    Serial.println("PIN written: " + newPin);
+    readedPin = newPin;
 }
 
 void Storage::readCredentials()
 {
-    File file = LittleFS.open(credentialsPath, "r");
-    if (!file)
-    {
-        Serial.println("File not found, creating new one...");
-        file = LittleFS.open(credentialsPath, "w");
-        if (file)
-        {
-            file.println("ESPSETUP,ESPSETUP");
-            file.close();
-            readedssid = "ESPSETUP";
-            readedpassword = "ESPSETUP";
-            Serial.println("File created");
-        }
-        else
-        {
-            Serial.println("Failed to create file");
-            return;
-        }
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS not available, using default credentials");
+        readedssid = "ESPSETUP";
+        readedpassword = "ESPSETUP";
+        return;
     }
-
-    readedssid = "";
-    readedpassword = "";
-
-    if (file.available())
-    {
-        String line = file.readStringUntil('\n');
-        int commaIndex = line.indexOf(',');
-        if (commaIndex > 0)
-        {
-            readedssid = line.substring(0, commaIndex);
-            readedpassword = line.substring(commaIndex + 1);
-        }
-        else
-        {
-            Serial.println("Invalid format in credentials file");
-            file.close();
-            return;
-        }
-        
+    
+    if (!LittleFS.exists("/wifi.csv")) {
+        Serial.println("WiFi file doesn't exist, creating default");
+        String defaultSSID = "ESPSETUP";
+        String defaultPassword = "ESPSETUP";
+        writeCredentials(defaultSSID, defaultPassword);
+        readedssid = defaultSSID;
+        readedpassword = defaultPassword;
+        return;
     }
+    
+    File file = LittleFS.open("/wifi.csv", "r");
+    if (!file) {
+        Serial.println("Failed to open WiFi file");
+        readedssid = "ESPSETUP";
+        readedpassword = "ESPSETUP";
+        return;
+    }
+    
+    String line = file.readStringUntil('\n');
     file.close();
-
-    Serial.println("ssid:");
-    Serial.println(readedssid);
-    Serial.println("password:");
-    Serial.println(readedpassword);
-
+    
+    int commaIndex = line.indexOf(',');
+    if (commaIndex > 0) {
+        readedssid = line.substring(0, commaIndex);
+        readedpassword = line.substring(commaIndex + 1);
+        readedssid.trim();
+        readedpassword.trim();
+    } else {
+        readedssid = "ESPSETUP";
+        readedpassword = "ESPSETUP";
+    }
+    
+    Serial.println("Read SSID: " + readedssid);
+    Serial.println("Read Password: " + readedpassword);
 }
 
 void Storage::writeCredentials(String &ssid, String &password)
 {
-    File file = LittleFS.open(credentialsPath, "w");
-    if (!file)
-    {
-        Serial.println("Failed to open credentials file for writing");
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS not available, cannot write credentials");
         return;
     }
-
-    file.println(ssid + "," + password);
+    
+    File file = LittleFS.open("/wifi.csv", "w");
+    if (!file) {
+        Serial.println("Failed to open WiFi file for writing");
+        return;
+    }
+    
+    file.print(ssid + "," + password);
     file.close();
-    Serial.println("Credentials written to file");
+    Serial.println("WiFi credentials written: " + ssid + " / " + password);
+    readedssid = ssid;
+    readedpassword = password;
 }
 
 String Storage::readMode()
 {
-    File file = LittleFS.open(modePath, "r");
-    if (!file)
-    {
-        Serial.println("File not found, creating new one...");
-        file = LittleFS.open(modePath, "w");
-        if (file)
-        {
-            file.println("0");
-            file.close();
-            Serial.println("File created");
-            readedMode = "0";
-            return readedMode;
-        }
-        else
-        {
-            Serial.println("Failed to create file");
-            return "";
-        }
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS not available, using default mode");
+        readedMode = "0";
+        return "0";
     }
-
-    readedMode = file.readStringUntil('\n');
+    
+    if (!LittleFS.exists("/mode.txt")) {
+        Serial.println("Mode file doesn't exist, creating default");
+        writeMode("0");
+        return "0";
+    }
+    
+    File file = LittleFS.open("/mode.txt", "r");
+    if (!file) {
+        Serial.println("Failed to open mode file");
+        readedMode = "0";
+        return "0";
+    }
+    
+    String mode = file.readString();
     file.close();
-
-    readedMode.trim();
-
-    Serial.println("Mode:");
-    Serial.println(readedMode);
-
-    return readedMode;
+    mode.trim();
+    
+    Serial.println("Read mode: " + mode);
+    readedMode = mode;
+    return mode;
 }
 
 void Storage::writeMode(const String &mode)
 {
-    File file = LittleFS.open(modePath, "w");
-    if (!file)
-    {
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS not available, cannot write mode");
+        return;
+    }
+    
+    File file = LittleFS.open("/mode.txt", "w");
+    if (!file) {
         Serial.println("Failed to open mode file for writing");
         return;
     }
-
-    file.println(mode);
+    
+    file.print(mode);
     file.close();
-    Serial.println("Mode written to file");
+    Serial.println("Mode written: " + mode);
+    readedMode = mode;
 }

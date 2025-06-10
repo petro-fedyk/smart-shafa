@@ -29,6 +29,7 @@ public:
     String readedMode;
     String readMode();
     void writeMode(const String &mode);
+    void listFiles();
     // void deletePin();
     // void checkFolder(const char *path);
     // void writeWiFiData();
