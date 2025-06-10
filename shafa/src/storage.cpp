@@ -4,20 +4,16 @@ void Storage::StorageSetup()
 {
     Serial.println("Initializing LittleFS...");
     
-    // Try multiple mount attempts with different configurations
     bool mounted = false;
     
-    // First try: Normal mount
     if (LittleFS.begin()) {
         mounted = true;
         Serial.println("LittleFS mounted successfully (normal)");
     }
-    // Second try: Mount with format on fail
     else if (LittleFS.begin(true)) {
         mounted = true;
         Serial.println("LittleFS mounted successfully (with format)");
     }
-    // Third try: Explicit format then mount
     else {
         Serial.println("Formatting LittleFS...");
         if (LittleFS.format()) {
@@ -30,7 +26,6 @@ void Storage::StorageSetup()
     
     if (!mounted) {
         Serial.println("LittleFS Mount Failed completely! Using defaults.");
-        // Set default values in memory
         readedPin = "1234";
         readedssid = "ESPSETUP";
         readedpassword = "ESPSETUP";
@@ -38,14 +33,11 @@ void Storage::StorageSetup()
         return;
     }
     
-    // LittleFS is working, check and create files
     Serial.println("LittleFS mounted successfully");
     
-    // Check total and used space
     Serial.printf("LittleFS Total: %d bytes, Used: %d bytes\n", 
                   LittleFS.totalBytes(), LittleFS.usedBytes());
     
-    // Check if files exist, create them if they don't
     if (!LittleFS.exists("/pin.txt")) {
         String defaultPin = "1234";
         writePin(defaultPin);
@@ -60,11 +52,10 @@ void Storage::StorageSetup()
     }
     
     if (!LittleFS.exists("/mode.txt")) {
-        writeMode("0"); // Default to AP mode
+        writeMode("0");
         Serial.println("Created default mode file");
     }
     
-    // List all files for debugging
     listFiles();
 }
 
@@ -81,6 +72,9 @@ void Storage::listFiles() {
     } else {
         Serial.println("Failed to open root directory");
     }
+    readPin();
+    readCredentials();
+    readMode();
 }
 
 String Storage::readPin()

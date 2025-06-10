@@ -39,7 +39,7 @@ void checkTryUnlock()
         String json = createJsonString(buffer, methdot, isSuccess);
         sendToSrver(buffer, methdot, isSuccess);
         
-        sentData();
+        // sentData();
         
         keyPadControl.isSuccess = false;
         keyPadControl.isKeyUnlock = false;
@@ -60,10 +60,11 @@ String checkMethod(KeyPadControl &control)
 
 String createJsonString(const String &buffer, const String &methdot, bool isSuccess)
 {
-    StaticJsonDocument<200> doc; // Використовуйте StaticJsonDocument для JSON
+    DynamicJsonDocument doc(512);
     doc["time"] = buffer;
-    doc["method"] = methdot;
+    doc["unlockMethod"] = methdot;
     doc["isSuccess"] = isSuccess;
+    doc["user"] = "ESP32_User";
 
     String output;
     serializeJson(doc, output);

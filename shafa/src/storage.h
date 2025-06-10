@@ -2,7 +2,6 @@
 #define STORAGE_H
 #include <ArduinoJson.h>
 #include <LittleFS.h>
-// #include "webServer.h"
 
 class Storage
 {
@@ -10,11 +9,6 @@ private:
     const String pinPath = "/pin.txt";
     const String modePath = "/mode.txt";
     const String credentialsPath = "/wifi.csv";
-
-
-
-    // String ssid;
-    // String password;
 
 public:
     void StorageSetup();
@@ -30,10 +24,6 @@ public:
     String readMode();
     void writeMode(const String &mode);
     void listFiles();
-    // void deletePin();
-    // void checkFolder(const char *path);
-    // void writeWiFiData();
-    // void readWiFiData();
 };
 
 #endif
