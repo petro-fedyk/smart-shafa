@@ -38,7 +38,7 @@ void turnAlarm()
   if (millis() - curAlarmTime >= ALARM_UPDATE)
   {
 
-    if (isAlarm && !previousAlarm)
+    if (isAlarm != previousAlarm)
     {
       buzzer.alarmSound();
       transistor.unlock();
