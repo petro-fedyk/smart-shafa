@@ -46,7 +46,6 @@ void MyClock::setFont()
         }
     }
 
-    // Створюємо всі 8 користувацьких символів
     memcpy_P(buffer, square_two_00, 8);
     lcd->createChar(0, buffer);
     memcpy_P(buffer, square_two_01, 8);

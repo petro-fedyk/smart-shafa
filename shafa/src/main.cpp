@@ -28,7 +28,7 @@ const int daylightOffset_sec = 3600;
 MyClock myClock(&lcd, gmtOffset_sec, daylightOffset_sec, NTP_SERVER1, NTP_SERVER2);
 KeyPadControl keyPadControl(lcd, storage, transistor, myClock, buzzer);
 
-wifi_mode_t wifi_mode = WIFI_MODE_AP;
+wifi_mode_t wifi_mode = WIFI_MODE_STA;
 
 void setup()
 {
@@ -38,8 +38,6 @@ void setup()
   Serial.println(PASSWORD);
   connectToWiFi(WIFI_SSID, PASSWORD, &wifi_mode);
   setupOTA("my_esp32", OTA_PIN);
-
-  // screenInit();
 
   myClock.initClock();
 

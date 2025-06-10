@@ -44,7 +44,6 @@ void KeyPadControl::keyPadLoop()
 
   if (key == BTN_REBOOT)
   {
-    // ESP.restart();
     esp_restart();
   }
   if (key == BTN_BACKLIGHT)

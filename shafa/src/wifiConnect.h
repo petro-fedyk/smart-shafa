@@ -3,7 +3,7 @@
 
 #include <WiFi.h>
 
-void connectToWiFi(const char *ssid, const char *password, wifi_mode_t *mode)
+void connectToWiFi(char *ssid, char *password, wifi_mode_t *mode)
 {
     WiFi.disconnect();
     WiFi.mode(*mode);
