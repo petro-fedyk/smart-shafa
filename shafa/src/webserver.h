@@ -128,6 +128,8 @@ void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                 }
                 else
                 {
+                    sendToSrver("WEB", false);
+
 
                     response["status"] = "error";
                     response["message"] = "Invalid PIN - unlock failed";
