@@ -1,2 +1,11 @@
 .venv
 *.txt
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.egg-info  
