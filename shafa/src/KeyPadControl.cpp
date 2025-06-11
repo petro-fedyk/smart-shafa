@@ -214,7 +214,7 @@ void KeyPadControl::keyPadLoop()
       lcdStateMachine(lcdState);
 
       buzzer.unsuccessSound();
-      isKeyUnlock = true;
+      isKeyUnlock = false;
       isSuccess = false;
     }
     clearPin();
