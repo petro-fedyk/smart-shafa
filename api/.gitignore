@@ -9,3 +9,4 @@
 *.pyd
 *.pkl
 *.egg-info  
+shafa_multi_table.db
