@@ -4,18 +4,17 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include "KeyPadControl.h"
-#include "clock.h"
 #include "sendToApi.h"
+#include "security.h"
 
 extern KeyPadControl keyPadControl;
-extern MyClock myClock;
 
 bool wasTried = false;
 
 String checkMethod(KeyPadControl &control);
 void printJson(const String &json);
-String createJsonString(const String &buffer, const String &methdot, bool isSuccess);
-void sendToSrver(const String &buffer, const String &methdot, bool isSuccess);
+String createJsonString(const String &methdot, bool isSuccess);
+void sendToSrver(const String &methdot, bool isSuccess);
 void sentData();
 
 void checkTryUnlock()
@@ -27,7 +26,6 @@ void checkTryUnlock()
         keyPadControl.isSuccess;
         keyPadControl.isKeyUnlock;
 
-        String buffer = myClock.getFormattedDateTime();
         String methdot = checkMethod(keyPadControl);
         bool isSuccess = keyPadControl.isKeyUnlock;
 
@@ -36,8 +34,8 @@ void checkTryUnlock()
         Serial.print("isSuccess: ");
         Serial.println(isSuccess);
 
-        String json = createJsonString(buffer, methdot, isSuccess);
-        sendToSrver(buffer, methdot, isSuccess);
+        String json = createJsonString(methdot, isSuccess);
+        sendToSrver(methdot, isSuccess);
         
         // sentData();
         
@@ -58,13 +56,24 @@ String checkMethod(KeyPadControl &control)
     return methdot;
 }
 
-String createJsonString(const String &buffer, const String &methdot, bool isSuccess)
+String createJsonString(const String &method, bool isSuccess)
 {
-    DynamicJsonDocument doc(512);
-    doc["time"] = buffer;
-    doc["unlockMethod"] = methdot;
-    doc["isSuccess"] = isSuccess;
-    doc["user"] = "ESP32_User";
+    DynamicJsonDocument doc(256);
+    
+    doc["device_id"] = DEVICE_ID;
+    Serial.print("Device ID: ");
+    Serial.println(DEVICE_ID);
+    Serial.print("Method: ");
+    Serial.println(method);
+    if (method == "KeyPad") {
+        doc["method_id"] = 1;
+    } else if (method == "WEB") {
+        doc["method_id"] = 2;
+    } else {
+        doc["method_id"] = 1;
+    }
+    
+    doc["is_success"] = isSuccess;
 
     String output;
     serializeJson(doc, output);

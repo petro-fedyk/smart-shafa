@@ -10,6 +10,8 @@
 #define GTMOFFSET_SEC 72000
 #define DAYLIGHTOFFSET 3600
 
+#define DEVICE_ID 1
+
 #define API_URL "http://api.openweathermap.org/data/2.5/weather?"
 #define API_KEY "6d8199d6941335b395faecf4bd1980cd"
 

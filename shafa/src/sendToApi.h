@@ -6,9 +6,9 @@
 
 uint8_t debug = 0;
 
-String createJsonString(const String &buffer, const String &methdot, bool isSuccess);
+String createJsonString(const String &methdot, bool isSuccess);
 
-const char *serverName = "http://192.168.31.113:5000/api/shafa_data/";
+const char *serverName = "http://192.168.31.21:5000/api/logs";
 
 void testBasicConnectivity() {
     Serial.println("=== Testing Basic Connectivity ===");
@@ -27,7 +27,7 @@ void testBasicConnectivity() {
     HTTPClient http;
     WiFiClient client;
     
-    http.begin(client, "http://192.168.31.113:5000/");
+    http.begin(client, "http://192.168.31.21:5000/");
     http.setTimeout(5000);
     
     int httpResponseCode = http.GET();
@@ -42,7 +42,7 @@ void testBasicConnectivity() {
     Serial.println("===================");
 }  
 
-void sendToSrver(const String &buffer, const String &methdot, bool isSuccess)
+void sendToSrver(const String &methdot, bool isSuccess)
 {
     if (debug == 1) {
         Serial.println("=== WiFi Debug Info ===");
@@ -77,8 +77,12 @@ void sendToSrver(const String &buffer, const String &methdot, bool isSuccess)
 
     http.begin(client, serverName);
     http.addHeader("Content-Type", "application/json");
+    extern Storage storage;
+    String userPin = storage.readPin();
+    http.addHeader("X-Auth-PIN", userPin);
+    http.setTimeout(15000);
 
-    String jsonStr = createJsonString(buffer, methdot, isSuccess);
+    String jsonStr = createJsonString(methdot, isSuccess);
 
     int httpResponseCode = http.POST(jsonStr);
 

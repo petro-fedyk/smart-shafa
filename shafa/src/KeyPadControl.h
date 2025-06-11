@@ -40,7 +40,7 @@ public:
     Keypad customKeypad;
     bool isKeyPressed;
     bool isKeyUnlock = false;
-    bool isSuccess = false; // move to global variable
+    bool isSuccess = false;
     bool tryToUnlock = false;
 };
 
