@@ -8,9 +8,6 @@ char hexaKeys[KEYPAD_ROWS][KEYPAD_COLS] = {
     {'7', '8', '9', 'C'},
     {'E', '0', 'F', 'D'}};
 
-// const char initialPassword[PASSWORD_LENGTH] = {'1', '2', '3', '4'};
-// const String PIN = "1234";
-
 uint8_t rowPins[KEYPAD_ROWS] = {PIN_ROW_1, PIN_ROW_2, PIN_ROW_3, PIN_ROW_4};
 uint8_t colPins[KEYPAD_COLS] = {PIN_COL_1, PIN_COL_2, PIN_COL_3, PIN_COL_4};
 
@@ -42,13 +39,19 @@ void KeyPadControl::keyPadLoop()
   char key = customKeypad.getKey();
   isKeyPressed = (key != NO_KEY);
 
+  handleMessageTimeout();
+
   if (key == BTN_REBOOT)
   {
     esp_restart();
   }
+
   if (key == BTN_BACKLIGHT)
   {
     clearPin();
+    showingMessage = false;
+    lcdState = 0;
+    lcdStateMachine(lcdState);
     static bool backlightOn = true;
     backlightOn = !backlightOn;
     if (backlightOn)
@@ -59,17 +62,27 @@ void KeyPadControl::keyPadLoop()
     {
       lcd.noBacklight();
     }
+    return;
   }
 
   if (key)
   {
     lastKeyPressTime = millis();
-    lcdStateMachine(lcdState);
+
     if (RTclock.isClockShow)
     {
       RTclock.isClockShow = false;
       RTclock.firstUpdate = true;
       clearPin();
+      showingMessage = false;
+      lcdState = 0;
+      lcdStateMachine(lcdState);
+    }
+    else if (showingMessage && (lcdState == 4 || lcdState == 5 || lcdState == 6 || lcdState == 7))
+    {
+      showingMessage = false;
+      clearPin();
+      lcdState = 0;
       lcdStateMachine(lcdState);
     }
   }
@@ -79,6 +92,7 @@ void KeyPadControl::keyPadLoop()
     if (!RTclock.isClockShow)
     {
       Serial.println("No activity detected. Switching to clock mode...");
+      showingMessage = false;
       lcdState = 8;
       lcdStateMachine(lcdState);
     }
@@ -88,6 +102,7 @@ void KeyPadControl::keyPadLoop()
   if (key == CHANGE_PIN)
   {
     changePasswordMode = true;
+    showingMessage = false;
     lcdState = 1;
     lcdStateMachine(lcdState);
     Serial.println("Change password mode activated");
@@ -128,7 +143,6 @@ void KeyPadControl::keyPadLoop()
 
         if (tempPin == confirmPin)
         {
-          // * currently works but plz FIXME
           Serial.println("Password changed successfully");
           storage.writePin(confirmPin);
           Serial.print("New PIN: ");
@@ -140,6 +154,10 @@ void KeyPadControl::keyPadLoop()
           tempPin = "";
           confirmPin = "";
           changePasswordStage = 0;
+
+          messageStartTime = millis();
+          showingMessage = true;
+          pendingState = 0;
         }
         else
         {
@@ -147,9 +165,11 @@ void KeyPadControl::keyPadLoop()
           lcdStateMachine(lcdState);
           Serial.println("Password confirmation mismatch");
           clearPin();
+
+          messageStartTime = millis();
+          showingMessage = true;
+          pendingState = 0;
         }
-        clearPin();
-        lcdStateMachine(lcdState);
         changePasswordMode = false;
       }
       else
@@ -157,20 +177,24 @@ void KeyPadControl::keyPadLoop()
         lcdState = 6;
         lcdStateMachine(lcdState);
         clearPin();
-        lcdStateMachine(lcdState);
+
+        messageStartTime = millis();
+        showingMessage = true;
+        pendingState = 0;
         changePasswordMode = false;
       }
     }
-    else if (key == BTN_RESET)
+    else if (key == BTN_RESET || key == 'C')
     {
       changePasswordMode = false;
       changePasswordStage = 0;
       clearPin();
+      showingMessage = false;
+      lcdState = 0;
       lcdStateMachine(lcdState);
     }
     else if (key != NO_KEY)
     {
-      // String pinDisplay = enterPin();
       if (pinIndex < PASSWORD_LENGTH)
       {
         enteredPin[pinIndex++] = key;
@@ -199,11 +223,14 @@ void KeyPadControl::keyPadLoop()
       transistor.unlock();
       Serial.println("Access Granted");
       clearPin();
-      lcdStateMachine(lcdState);
 
       buzzer.successSound();
       isKeyUnlock = true;
       isSuccess = true;
+
+      messageStartTime = millis();
+      showingMessage = true;
+      pendingState = 0;
     }
     else
     {
@@ -211,23 +238,30 @@ void KeyPadControl::keyPadLoop()
       lcdStateMachine(lcdState);
       Serial.println("Wrong Code");
       clearPin();
-      lcdStateMachine(lcdState);
 
       buzzer.unsuccessSound();
       isKeyUnlock = false;
       isSuccess = false;
+
+      messageStartTime = millis();
+      showingMessage = true;
+      pendingState = 0;
     }
-    clearPin();
-    lcdStateMachine(lcdState);
   }
-  else if (key == BTN_RESET)
+  else if (key == BTN_RESET || key == 'C')
   {
     clearPin();
+    showingMessage = false;
+    lcdState = 0;
     lcdStateMachine(lcdState);
   }
-  else if (key != NO_KEY)
+  else if (key != NO_KEY && !showingMessage)
   {
-    // String pinDisplay = enterPin();
+    if (lcdState != 0)
+    {
+      lcdState = 0;
+      lcdStateMachine(lcdState);
+    }
 
     if (pinIndex < PASSWORD_LENGTH)
     {
@@ -243,7 +277,6 @@ void KeyPadControl::keyPadLoop()
       lcd.print(pinDisplay);
     }
   }
-  // tryToUnlock = false;
 }
 
 bool KeyPadControl::isUnlockCodeCorrect()
@@ -286,10 +319,22 @@ void KeyPadControl::clearPin()
 
   pinIndex = 0;
   lcd.setCursor(0, 0);
-  lcdState = 0;
-  // isKeyUnlock = false;
-  // isSuccess = false;
-  // tryToUnlock = false;
+}
+
+void KeyPadControl::handleMessageTimeout()
+{
+  if (showingMessage && (millis() - messageStartTime > 2000))
+  {
+    showingMessage = false;
+    lcdState = pendingState;
+    lcdStateMachine(lcdState);
+
+    if (changePasswordMode)
+    {
+      changePasswordMode = false;
+      changePasswordStage = 0;
+    }
+  }
 }
 
 void KeyPadControl::lcdStateMachine(uint8_t &state)
@@ -330,6 +375,7 @@ void KeyPadControl::lcdStateMachine(uint8_t &state)
     lcd.clear();
     lcd.print("Wrong Pass");
     Serial.println("Wrong Pass");
+    break;
   case 7:
     lcd.clear();
     lcd.print("Access Granted");

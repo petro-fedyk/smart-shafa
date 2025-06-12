@@ -13,6 +13,13 @@
 class KeyPadControl
 {
 private:
+
+    unsigned long messageStartTime;
+    bool showingMessage;
+    uint8_t pendingState;
+    
+    void handleMessageTimeout();
+
     uint8_t enteredPin[4];
     uint8_t pinIndex;
     LiquidCrystal_I2C &lcd;
