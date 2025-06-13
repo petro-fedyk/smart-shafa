@@ -18,7 +18,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     pin = db.Column(db.String(4), unique=True, nullable=False) 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     def __repr__(self):
         return f"<User {self.username}>"
@@ -43,7 +43,7 @@ class UnlockMethodModel(db.Model):
 class AccessLogModel(db.Model):
     __tablename__ = 'access_logs'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
     is_success = db.Column(db.Boolean, nullable=False)
     
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -170,7 +170,7 @@ class ShafaDataResource(Resource):
             device_id=device.id,
             method_id=method.id,
             is_success=args['is_success'],
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now()
         )
         db.session.add(new_log)
         db.session.commit()
@@ -197,7 +197,7 @@ class AccessLogListResource(Resource):
             device_id=args['device_id'],
             method_id=args['method_id'],
             is_success=args['is_success'],
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now()
         )
         db.session.add(new_log)
         db.session.commit()
